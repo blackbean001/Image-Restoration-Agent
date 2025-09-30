@@ -508,7 +508,6 @@ class IRAgent:
             tool_dir = subtask_dir / f"tool-{tool.tool_name}"
             output_dir = tool_dir / "0-img"
             output_dir.mkdir(parents=True)
-
             # invoke tool
             if cache is None:
                 tool(

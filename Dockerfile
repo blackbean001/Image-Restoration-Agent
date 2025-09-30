@@ -35,6 +35,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76  \
   && apt-get install -y ffmpeg libsm6 libxext6  \
   && cd /app/AgenticIR && pip install -r installation/requirements.txt  \
   && pip install -y git+https://github.com/openai/CLIP.git \
+  && pip install langgraph \
 \
   && conda create -y -n depictqa python=3.10  \
   && source activate depictqa  \

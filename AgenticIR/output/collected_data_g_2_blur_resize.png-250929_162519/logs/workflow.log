@@ -1,0 +1,12 @@
+2025-09-29 16:25:21,528 - INFO
+Evaluation: [('motion blur', 'high'), ('defocus blur', 'medium'), ('rain', 'very low'), ('haze', 'low'), ('dark', 'very low'), ('noise', 'very low'), ('jpeg compression artifact', 'very low')]
+
+2025-09-29 16:25:26,281 - INFO
+Insights: Considering the nature of both motion blur and defocus blur, it's generally more effective to address the blur that affects the image more globally and uniformly first, which is typically motion blur. Motion blur often impacts the entire image due to camera or object movement, while defocus blur might be more localized or vary across the image depending on the depth field and lens characteristics. Therefore, starting with motion deblurring could provide a more stable and uniform base for subsequent defocus deblurring, potentially leading to better overall clarity and detail restoration.
+
+2025-09-29 16:25:26,281 - INFO
+Plan: ['motion deblurring', 'defocus deblurring']
+
+2025-09-29 16:25:26,282 - INFO
+Executing motion deblurring on input...
+

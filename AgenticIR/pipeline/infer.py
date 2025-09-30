@@ -25,8 +25,8 @@ def get_all_files(dir_path):
 input_path = Path(input_path).resolve()
 agent = IRAgent(
     input_path=input_path, output_dir=output_dir,
-    #evaluate_degradation_by="depictqa",
-    evaluate_degradation_by="clip_retrieval",
+    evaluate_degradation_by="depictqa",
+    #evaluate_degradation_by="clip_retrieval",
     with_retrieval=True,
     with_reflection=True,
     reflect_by="depictqa",

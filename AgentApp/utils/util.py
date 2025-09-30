@@ -1,5 +1,5 @@
 import sys
-sys.path.append("../../AgenticIR")
+sys.path.append("/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgenticIR")
 
 import os
 from pathlib import Path
@@ -19,6 +19,7 @@ import clip
 from clip.model import CLIP
 
 from pipeline.insert_emb_to_postgresql import *
+import pipeline.prompts as prompts
 from llm import GPT4, DepictQA
 from executor import executor, Tool
 
@@ -43,8 +44,7 @@ def get_logger(logger_name: str,
     Returns:
         logging.Logger: Logger object.
     """
-
-    logger_id = f"{logger_name}@{time()}"
+    logger_id = f"{logger_name}@{time.time()}"
     logger = logging.getLogger(logger_id)
     logger.setLevel(min(console_log_level, file_log_level))
 
@@ -70,7 +70,7 @@ qa_logger = get_logger(
         log_file= "logs/llm_qa.md",
         console_log_level=logging.WARNING,
         file_format_str="%(message)s",
-        silent=silent)
+        silent=True)
 
 
 workflow_format_str = "%(asctime)s - %(levelname)s\n%(message)s\n"
@@ -79,9 +79,9 @@ workflow_logger: logging.Logger = get_logger(
     log_file="logs/workflow.md",
     console_format_str=workflow_format_str,
     file_format_str=workflow_format_str,
-    silent=silent)
+    silent=True)
 
-degra_subtask_dict: dict[Degradation, Subtask] = {
+degra_subtask_dict = {
     "low resolution": "super-resolution",
     "noise": "denoising",
     "motion blur": "motion deblurring",
@@ -92,15 +92,17 @@ degra_subtask_dict: dict[Degradation, Subtask] = {
     "jpeg compression artifact": "jpeg compression artifact removal",
 }
 
-subtask_degra_dict: dict[Subtask, Degradation] = {
+
+subtask_degra_dict = {
     v: k for k, v in degra_subtask_dict.items()
 }
 degradations = set(degra_subtask_dict.keys())
 subtasks = set(degra_subtask_dict.values())
-levels: list[Level] = ["very low", "low", "medium", "high", "very high"]
+levels = ["very low", "low", "medium", "high", "very high"]
 
 
 def generate_retrieval_embedding(state):
+    #print("state: ", state)
     combining_function = state["retrieval_args"]["combining_function"]
     combiner_path = state["retrieval_args"]["combiner_path"]
     clip_model_name = state["retrieval_args"]["clip_model_name"]
@@ -153,12 +155,12 @@ def generate_retrieval_embedding(state):
     with torch.no_grad():
         text_feature = clip_model.encode_text(text_input)
 
-    image = preprocess(PIL.Image.open(state["input_img_path"]).to(device, non_blocking=True).unsqueeze(0)
+    image = preprocess(PIL.Image.open(state["input_img_path"])).to(device, non_blocking=True).unsqueeze(0)
     with torch.no_grad():
         image_feature = clip_model.encode_image(image)
 
     embedding = F.normalize(combining_function(image_feature, text_feature), dim=-1)
-    print(f"generate embedding for {state['input_path'], shape {embedding.shape}")
+    print(f"generate embedding for {state['input_img_path']}, shape {embedding.shape}")
 
     return embedding
 
@@ -263,7 +265,7 @@ def get_GPT4(llm_config_path = "config.yml"):
     return gpt4
 
 
-def schedule_w_retrieval(state, gpt4, degradations, agenda, ps):
+def schedule_w_experience(state, gpt4, degradations, agenda, ps):
     def check_order(schedule: object):
         assert isinstance(schedule, dict), "Schedule should be a dict."
         assert set(schedule.keys()) == {"thought", "order"}, \
@@ -275,7 +277,7 @@ def schedule_w_retrieval(state, gpt4, degradations, agenda, ps):
     with open(state["schedule_experience_path"], "r") as f:
         schedule_experience: str = json.load(f)["distilled"]
 
-    schedule = get4(
+    schedule = gpt4(
             prompt=prompts.schedule_w_retrieval_prompt.format(
                 degradations=degradations, agenda=agenda,
                 experience=schedule_experience
@@ -294,7 +296,7 @@ def reason_to_schedule(gpt4, degradations, agenda):
     workflow_logger.info(f"Insights: {insights}")
     return insights
 
-def schedule_wo_retrieval(state, gpt4, degradations, agenda, ps):
+def schedule_wo_experience(state, gpt4, degradations, agenda, ps):
     insights = reason_to_schedule(gpt4, degradations, agenda)
 
     def check_order(order: object):
@@ -309,7 +311,7 @@ def schedule_wo_retrieval(state, gpt4, degradations, agenda, ps):
     )
     return eval(order)
 
-def get_toolbox(subtask):
+def get_toolbox(state, subtask):
     # subtask: ['haze', 'low-light',...]
     if state["sim"] <= 0.9:    
         toolbox = executor.toolbox_router[subtask]
@@ -328,7 +330,7 @@ def search_best_by_comp(candidates, state):
     best_img = candidates[0]
     for i in range(1, len(candidates)):
         cur_img = candidates[i]
-        choice = compare_quality(state.depictqa, best_img, cur_img)
+        choice = compare_quality(state["depictqa"], best_img, cur_img)
         if choice == "latter":
             best_img = cur_img
     return best_img
