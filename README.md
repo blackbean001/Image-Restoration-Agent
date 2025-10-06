@@ -1,4 +1,4 @@
-**Intro**
+**Intro**    
 An automatic image restoration tool based on AgenticIR (https://github.com/Kaiwen-Zhu/AgenticIR) and CLIP4CIR (https://github.com/ABaldrati/CLIP4Cir/tree/master). 
 
 We use CLIP4CIR to extract embeddings and degradation sequences of low-quality images, then store them to PostgreSQL for retrieval when new low-quality images come. Therefore, the processing time will be considerably shortened.
