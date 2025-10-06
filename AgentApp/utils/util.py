@@ -47,7 +47,6 @@ def get_logger(logger_name: str,
     logger_id = f"{logger_name}@{time.time()}"
     logger = logging.getLogger(logger_id)
     logger.setLevel(min(console_log_level, file_log_level))
-
     if not silent:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(console_log_level)

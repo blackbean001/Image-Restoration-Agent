@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, END
-import copy
+from copy import deepcopy as cpy
 from PIL import Image, ImageOps
 from pathlib import Path
 import shutil
@@ -43,12 +43,15 @@ class ImageState(dict):
     subtask_success: dict
     task_id: str
     qa_logger: logging.Logger
+    with_rollback: bool
+    tool_execution_count: int
+    executed_plans: list
 
 
 def load_image(state: ImageState):
     img = Image.open(state["input_img_path"])
     state["image"] = img
-    state["cur_path"] = state["input_img_path"]
+    state["cur_path"] = cpy(state["input_img_path"])
     shutil.copy(state["input_img_path"], tmp_input_dir / "input.png")
     #shutil.copy(state["input_img_path"], tmp_input_dir / "input" / "input.png")
     print(f"Finished loading image from {state['input_img_path']}, and copy to {tmp_input_dir}")
@@ -87,6 +90,7 @@ def first_evaluate_by_depictqa(state: ImageState):
 
 
 def evaluate_tool_result(state: ImageState):
+    print("Evaluate img: ", state["cur_path"])
     level = eval(
         state["depictqa"](Path(state["cur_path"]), task="eval_degradation")
         )[0][1]
@@ -115,8 +119,8 @@ def propose_plan_depictqa(state: ImageState):
     else:
         plan = schedule_wo_experience(state, state["gpt4"], degradations, agenda, "")
 
-    state["initial_plan"] = copy.deepcopy(plan)
-    state["remaining_plan"] = plan
+    state["initial_plan"] = cpy(plan)
+    state["remaining_plan"] = cpy(plan)
     print(f"Finished proposing plan with DepictQA: {state['initial_plan']}")
     return state
 
@@ -127,19 +131,22 @@ def propose_plan_retrieval(state: ImageState):
     #        ("haze", "dehaze-former"), ...]
     evaluation = state["res_seq_retrieved"]
     plan = [(item[0], item[1]) for item in evaluation]
-    state["initial_plan"] = copy.deepcopy(plan)
-    state["remaining_plan"] = plan
+    state["initial_plan"] = cpy(plan)
+    state["remaining_plan"] = cpy(plan)
     print(f"Finished proposing plan with PostgreSQL retrieval: {state['initial_plan']}")
     return state
 
 
 def execute_one_degradation(state:ImageState):
     remaining_plan = state["remaining_plan"]
-    print(f"Remaining subtasks for execution: {state['remaining_plan']}")
-    index = str(len(state["initial_plan"])-len(remaining_plan))
+    state["executed_plans"].append(cpy(remaining_plan))
+    print(f"Remaining subtasks for execution: {remaining_plan}")
+    print(f"Executed_plans: ", state['executed_plans'])
 
+    index = str(state["tool_execution_count"])
+    
     subtask = remaining_plan.pop(0)
-
+    
     # only one tool when using retrieval
     toolbox = get_toolbox(state, subtask)
 
@@ -166,7 +173,7 @@ def execute_one_degradation(state:ImageState):
 
     res_degra_level_dict: dict[str, list[Path]] = {}
     success = True
-    best_img_path = state["cur_path"]
+    best_img_path = cpy(state["cur_path"])
 
     for tool in toolbox:
         tool_output_dir = subtask_output_dir / tool.tool_name
@@ -208,11 +215,23 @@ def execute_one_degradation(state:ImageState):
 
     state["remaining_plan"] = remaining_plan
     state["subtask_success"][subtask + "-" + index] = success
+    state["tool_execution_count"] += 1
+    
+    # rollback if not success
+    if not success and state["with_rollback"]:
+        roll_back_plans = state["remaining_plan"] + [subtask]
+        print(f"Plan {subtask} is not successful, thus need to rollback...")
+        if roll_back_plans not in state["executed_plans"]:
+            state["remaining_plan"] = roll_back_plans
+            print(f"Subtask ({subtask}) restoration not success, insert baack to the plans, current remaining plans: {remaining_plan}")
+    else:
+        print(f"Plan {subtask} execute successfully.")
     return state
 
 
 def get_output(state:ImageState):
     shutil.copy(state["best_img_path"], "final_output")    
+    print("Finished image restoration, output to ./final_output")
 
 
 # define workflow
@@ -277,7 +296,8 @@ invoke_dict = {}
 AgenticIR_dir = Path("/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgenticIR")
 CLIP4CIR_model_dir = Path("/home/jason/CLIP4Cir/models")
 
-invoke_dict["input_img_path"] = "/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgentApp/100.png"
+# set input_img_path
+invoke_dict["input_img_path"] = "/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgentApp/demo_input/001.png"
 
 invoke_dict["depictqa"] = get_depictqa()
 invoke_dict["gpt4"] = get_GPT4(AgenticIR_dir / "config.yml")
@@ -308,9 +328,12 @@ invoke_dict["subtask_degra_dict"] = {
         v: k for k, v in degra_subtask_dict.items()}
 invoke_dict["all_degradations"] = set(degra_subtask_dict.keys())
 invoke_dict["all_subtasks"] = set(degra_subtask_dict.values())
-invoke_dict['with_experience'] = True
-invoke_dict['subtask_success'] = {}
-invoke_dict['task_id'] = ""
+invoke_dict["with_experience"] = True
+invoke_dict["with_rollback"] = True
+invoke_dict["subtask_success"] = {}
+invoke_dict["task_id"] = ""
+invoke_dict["tool_execution_count"] = 0
+invoke_dict["executed_plans"] = []
 
 # compile and run
 app = workflow.compile()
