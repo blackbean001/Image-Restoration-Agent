@@ -12,8 +12,8 @@ We use CLIP4CIR to extract embeddings and degradation sequences of low-quality i
 **AgentApp**:  
 Use LangGraph to reproduce the functionality of AgenticIR, making it easier to manage the pipeline. To add new tools, one can easily define new nodes and link edges to existing nodes in the graph.    
 
-**To-do**:   
+**To-dos**:   
 1. Investigate inference acceleration methods.    
-2. service-enabling
+2. Enabling service
 
 ![image](https://github.com/blackbean001/Auto-Image-Restoration/blob/main/pngs/pipeline.png)
