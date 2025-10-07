@@ -9,11 +9,11 @@ We use CLIP4CIR to extract embeddings and degradation sequences of low-quality i
 3. Run "python -m pipeline.infer" to generate restoration results and saved in output. One can first use evaluate_degradation_by="depictqa" to generate initial outputs. After saving enough knowledge in Step 4, one can use evaluate_degradation_by="clip_retrieval" for efficienty.
 4. Refer to AgenticIR/retrieval_database/CLIP4CIR/run_pipeline.sh to train the model for image quality classification and insert history knowledge to PostgreSQL
 
-**AgentApp**:  
-Use LangGraph to reproduce the functionality of AgenticIR, making it easier to manage the pipeline. To add new tools, one can easily define new nodes and link edges to existing nodes in the graph.    
+**AgentApp**:   
+1. Service enabled by FastAPI, run test_api.sh to test.
+2. Use LangGraph to reproduce the functionality of AgenticIR, making it easier to manage the pipeline. To add new tools, one can easily define new nodes and link edges to existing nodes in the graph.    
 
 **To-dos**:   
 1. Investigate inference acceleration methods.    
-2. Enabling service
 
 ![image](https://github.com/blackbean001/Auto-Image-Restoration/blob/main/pngs/pipeline.png)

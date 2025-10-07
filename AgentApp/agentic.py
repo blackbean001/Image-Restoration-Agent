@@ -8,19 +8,13 @@ from time import localtime, strftime
 from utils.util import *
 
 
-tmp_input_dir = Path("tmp_img_input")
-tmp_output_dir = Path("tmp_img_output")
-final_output = Path("final_output")
-
-os.makedirs(tmp_input_dir, exist_ok=True)
-#os.makedirs(tmp_input_dir / "input", exist_ok=True)
-os.makedirs(tmp_output_dir, exist_ok=True)
-os.makedirs(final_output, exist_ok=True)
-
-
+# define LangGraph state
 class ImageState(dict):
     input_img_path: Path
     image: Image.Image
+    tmp_input_dir: Path
+    tmp_output_dir: Path
+    final_output: Path
     depictqa: DepictQA
     gpt4: GPT4
     levels: List
@@ -49,12 +43,14 @@ class ImageState(dict):
 
 
 def load_image(state: ImageState):
-    img = Image.open(state["input_img_path"])
-    state["image"] = img
+    assert state["input_img_path"] != "", "Please input image_path or image"
+    if state["image"] == None:
+        img = Image.open(state["input_img_path"])
+        state["image"] = img
     state["cur_path"] = cpy(state["input_img_path"])
-    shutil.copy(state["input_img_path"], tmp_input_dir / "input.png")
-    #shutil.copy(state["input_img_path"], tmp_input_dir / "input" / "input.png")
-    print(f"Finished loading image from {state['input_img_path']}, and copy to {tmp_input_dir}")
+
+    shutil.copy(state["input_img_path"], state["tmp_input_dir"] / "input.png")
+    print(f"Finished loading image from {state['input_img_path']}, and copy to {state['tmp_input_dir']}")
     return state
 
 
@@ -152,7 +148,7 @@ def execute_one_degradation(state:ImageState):
 
     o_name = "_".join(str(state['input_img_path']).split("/")[-1:])
     
-    processed_images = {item.split("-")[0]:None for item in os.listdir(tmp_output_dir)}
+    processed_images = {item.split("-")[0]:None for item in os.listdir(state['tmp_output_dir'])}
     if o_name in processed_images and index == 0:
         print(f"Image {o_name} has already been processed. SKIP...")
         skip = True
@@ -162,10 +158,10 @@ def execute_one_degradation(state:ImageState):
         task_id = f"{o_name}-{strftime('%y%m%d_%H%M%S', localtime())}"
         state["task_id"] = task_id
 
-        task_output_dir = os.path.join(os.path.abspath('.'), tmp_output_dir, task_id)
+        task_output_dir = os.path.join(os.path.abspath('.'), state['tmp_output_dir'], task_id)
         os.makedirs(task_output_dir, exist_ok=True)
     else:
-        task_output_dir = os.path.join(os.path.abspath('.'), tmp_output_dir, state["task_id"])
+        task_output_dir = os.path.join(os.path.abspath('.'), state['tmp_output_dir'], state["task_id"])
 
     subtask_output_dir = Path(task_output_dir) / (subtask + "-" + index)
     os.makedirs(subtask_output_dir, exist_ok=True)
@@ -179,7 +175,7 @@ def execute_one_degradation(state:ImageState):
         tool_output_dir = subtask_output_dir / tool.tool_name
         os.makedirs(tool_output_dir, exist_ok=True)
         tool(
-            input_dir=os.path.abspath('.') / tmp_input_dir,
+            input_dir=os.path.abspath('.') / state['tmp_input_dir'],
             output_dir=tool_output_dir,
             silent=True,
         )
@@ -191,7 +187,7 @@ def execute_one_degradation(state:ImageState):
             res_degra_level = "very low"
             best_tool_name = tool.tool_name
             state["best_img_path"] = tool_output_dir / "output.png"
-            shutil.copy(tool_output_dir / "output.png", tmp_input_dir / "input.png")
+            shutil.copy(tool_output_dir / "output.png", state['tmp_input_dir'] / "input.png")
             #shutil.copy(output_dir / "output.png", tmp_input_dir / "input" / "input.png")
             print(f"Finished subtask {subtask} by execution best tool: {best_tool_name}")
             break
@@ -209,7 +205,7 @@ def execute_one_degradation(state:ImageState):
                 print(f"Finished subtask by comparing, success: {success},  \
                         best_img_path: {best_img_path}, best_tool_name: {best_tool_name}")
                 res_degra_level = res_level
-                shutil.copy(best_img_path, tmp_input_dir / "input.png")
+                shutil.copy(best_img_path, state['tmp_input_dir'] / "input.png")
                 state["best_img_path"] = best_img_path
                 break
 
@@ -232,6 +228,7 @@ def execute_one_degradation(state:ImageState):
 def get_output(state:ImageState):
     shutil.copy(state["best_img_path"], "final_output")    
     print("Finished image restoration, output to ./final_output")
+    return state
 
 
 # define workflow
@@ -263,81 +260,92 @@ def plan_state(state:ImageState):
     else:
         return "continue"
 
+def create_image_analysis_graph():
+    #workflow.set_entry_point("init_agent")
+    #workflow.add_edge("init_agent", "load_image")
+    workflow.set_entry_point("load_image")
+    workflow.add_edge("load_image", "evaluate_by_retrieval")
+    workflow.add_conditional_edges(
+            "evaluate_by_retrieval",
+            use_retrieval,
+            {
+                "use_retrieval": "propose_plan_retrieval",
+                "use_depictqa": "first_evaluate_by_depictqa",
+            }
+    )
+    workflow.add_edge("first_evaluate_by_depictqa", "propose_plan_depictqa")
+    workflow.add_edge("propose_plan_depictqa", "execute_one_degradation")
+    workflow.add_edge("propose_plan_retrieval", "execute_one_degradation")
+    workflow.add_conditional_edges(
+            "execute_one_degradation",
+            plan_state,
+            {
+                "finish": "get_output",
+                "continue": "execute_one_degradation"
+            }
+    )
+    workflow.add_edge("get_output", END)
+    
+    return workflow.compile()
 
-#workflow.set_entry_point("init_agent")
-#workflow.add_edge("init_agent", "load_image")
-workflow.set_entry_point("load_image")
-workflow.add_edge("load_image", "evaluate_by_retrieval")
-workflow.add_conditional_edges(
-        "evaluate_by_retrieval",
-        use_retrieval,
-        {
-            "use_retrieval": "propose_plan_retrieval",
-            "use_depictqa": "first_evaluate_by_depictqa",
-        }
-)
-workflow.add_edge("first_evaluate_by_depictqa", "propose_plan_depictqa")
-workflow.add_edge("propose_plan_depictqa", "execute_one_degradation")
-workflow.add_edge("propose_plan_retrieval", "execute_one_degradation")
-workflow.add_conditional_edges(
-        "execute_one_degradation",
-        plan_state,
-        {
-            "finish": "get_output",
-            "continue": "execute_one_degradation"
-        }
-)
-workflow.add_edge("get_output", END)
 
+def run_agent():
+    # input args
+    invoke_dict = {}
 
-# input args
-invoke_dict = {}
+    AgenticIR_dir = Path("/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgenticIR")
+    CLIP4CIR_model_dir = Path("/home/jason/CLIP4Cir/models")
 
-AgenticIR_dir = Path("/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgenticIR")
-CLIP4CIR_model_dir = Path("/home/jason/CLIP4Cir/models")
+    # set input_img_path
+    invoke_dict["input_img_path"] = "/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgentApp/demo_input/001.png"
+    invoke_dict["image"] = None
 
-# set input_img_path
-invoke_dict["input_img_path"] = "/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgentApp/demo_input/001.png"
+    invoke_dict["depictqa"] = get_depictqa()
+    invoke_dict["gpt4"] = get_GPT4(AgenticIR_dir / "config.yml")
 
-invoke_dict["depictqa"] = get_depictqa()
-invoke_dict["gpt4"] = get_GPT4(AgenticIR_dir / "config.yml")
+    invoke_dict["levels"] = ["very low", "low", "medium", "high", "very high"]
+    invoke_dict["schedule_experience_path"] = AgenticIR_dir / "memory/schedule_experience.json"
 
-invoke_dict["levels"] = ["very low", "low", "medium", "high", "very high"]
-invoke_dict["schedule_experience_path"] = AgenticIR_dir / "memory/schedule_experience.json"
+    invoke_dict["retrieval_args"] = {}
+    invoke_dict["retrieval_args"]["combining_function"] = "combiner"
+    invoke_dict["retrieval_args"]["combiner_path"] = CLIP4CIR_model_dir / "combiner_trained_on_imgres_RN50x4_2025-09-05_12:30:03/saved_models/combiner_arithmetic.pt"
+    invoke_dict["retrieval_args"]["clip_model_name"] = "RN50x4"
+    invoke_dict["retrieval_args"]["clip_model_path"] = CLIP4CIR_model_dir / "clip_finetuned_on_imgres_RN50x4_2025-09-05_10:48:31/saved_models/tuned_clip_arithmetic.pt"
+    invoke_dict["retrieval_args"]["projection_dim"] = 2560
+    invoke_dict["retrieval_args"]["hidden_dim"] = 5120
+    invoke_dict["retrieval_args"]["transform"] = "targetpad"
+    invoke_dict["retrieval_args"]["target_ratio"] = 1.25
 
-invoke_dict["retrieval_args"] = {}
-invoke_dict["retrieval_args"]["combining_function"] = "combiner"
-invoke_dict["retrieval_args"]["combiner_path"] = CLIP4CIR_model_dir / "combiner_trained_on_imgres_RN50x4_2025-09-05_12:30:03/saved_models/combiner_arithmetic.pt"
-invoke_dict["retrieval_args"]["clip_model_name"] = "RN50x4"
-invoke_dict["retrieval_args"]["clip_model_path"] = CLIP4CIR_model_dir / "clip_finetuned_on_imgres_RN50x4_2025-09-05_10:48:31/saved_models/tuned_clip_arithmetic.pt"
-invoke_dict["retrieval_args"]["projection_dim"] = 2560
-invoke_dict["retrieval_args"]["hidden_dim"] = 5120
-invoke_dict["retrieval_args"]["transform"] = "targetpad"
-invoke_dict["retrieval_args"]["target_ratio"] = 1.25
+    invoke_dict["degra_subtask_dict"] = {
+                    "low resolution": "super-resolution",
+                    "noise": "denoising",
+                    "motion blur": "motion deblurring",
+                    "defocus blur": "defocus deblurring",
+                    "haze": "dehazing",
+                    "rain": "deraining",
+                    "dark": "brightening",
+                    "jpeg compression artifact": "jpeg compression artifact removal"}
+    invoke_dict["subtask_degra_dict"] = {
+                    v: k for k, v in degra_subtask_dict.items()}
+    invoke_dict["all_degradations"] = set(degra_subtask_dict.keys())
+    invoke_dict["all_subtasks"] = set(degra_subtask_dict.values())
+    invoke_dict["with_experience"] = True
+    invoke_dict["with_rollback"] = True
+    invoke_dict["tmp_input_dir"] = Path("tmp_img_input")
+    invoke_dict["tmp_output_dir"] = Path("tmp_img_output")
+    invoke_dict["final_output"] = Path("final_output")
+    invoke_dict["subtask_success"] = {}
+    invoke_dict["task_id"] = ""
+    invoke_dict["tool_execution_count"] = 0
+    invoke_dict["executed_plans"] = []
 
-invoke_dict["degra_subtask_dict"] = {
-                "low resolution": "super-resolution",
-                "noise": "denoising",
-                "motion blur": "motion deblurring",
-                "defocus blur": "defocus deblurring",
-                "haze": "dehazing",
-                "rain": "deraining",
-                "dark": "brightening",
-                "jpeg compression artifact": "jpeg compression artifact removal"}
-invoke_dict["subtask_degra_dict"] = {
-        v: k for k, v in degra_subtask_dict.items()}
-invoke_dict["all_degradations"] = set(degra_subtask_dict.keys())
-invoke_dict["all_subtasks"] = set(degra_subtask_dict.values())
-invoke_dict["with_experience"] = True
-invoke_dict["with_rollback"] = True
-invoke_dict["subtask_success"] = {}
-invoke_dict["task_id"] = ""
-invoke_dict["tool_execution_count"] = 0
-invoke_dict["executed_plans"] = []
+    # compile and run
+    app = create_image_analysis_graph()
+    result = app.invoke(invoke_dict)
 
-# compile and run
-app = workflow.compile()
-result = app.invoke(invoke_dict)
+if __name__ == "__main__":
+    run_agent()
+
 
 
 
