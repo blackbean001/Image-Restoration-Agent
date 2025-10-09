@@ -1,26 +1,31 @@
 # set pytorch:2.2.2-cuda12.1-cudnn8-deval as the base
-From pytorch/pytorch:2.2.2-cuda12.1-cudnn8-devel
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-devel
 
 # Set the working directory
 WORKDIR /app
 
 # Copy application files
-COPY /home/jason/AgenticIR /home/jason/CLIP4Cir ./
+#COPY ./AgenticIR ./
+#COPY ./CLIP4Cir ./
+
+# set environment
+ENV DEBIAN_FRONTEND=noninteractive
 
 # build postgresql environment
 RUN apt-get update  \
   && apt-get install -y git vim  \
   && apt-get install -y postgresql postgresql-client  \
   && /etc/init.d/postgresql start  \
-  && su postgres && createdb $db_name && exit  \
-  && pip install pgvector  && apt install postgresql-server-dev-14  \
+  && pip install pgvector  && apt install -y postgresql-server-dev-14  \
   && git clone --branch v0.8.1 https://github.com/pgvector/pgvector.git && cd pgvector && make && make install && cd .. \
-  && apt-get install libpq-dev && pip install psycopg2  \
+  && apt-get install -y libpq-dev && pip install psycopg2  \
   && sed -i '90s/.*/local   all             postgres                                peer/' /etc/postgresql/14/main/pg_hba.conf \
-  && apt-get install systemd  && service postgresql restart
+  && apt-get install -y systemd
 
 # build environment
 RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76  \
+  && rm /bin/sh && ln -s /bin/bash /bin/sh  \
+\
   && conda create -y -n clip4cir -y python=3.8  \
   && source activate clip4cir  \
   && conda install -y -c pytorch pytorch=1.11.0 torchvision=0.12.0  \
@@ -28,7 +33,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76  \
   && pip install -y comet-ml==3.21.0, urllib3==1.26.18  \
   && pip install -y git+https://github.com/openai/CLIP.git  \
   && pip install pgvector  \
-  && apt-get install libpq-dev && pip install psycopg2  \
+  && apt-get install -y libpq-dev && pip install psycopg2  \
 \
   && conda create -y -n agenticir python=3.10  \
   && source activate agenticir  \
@@ -93,20 +98,9 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76  \
   && source activate xrestormer  \
   && pip install -r /app/AgenticIR/executor/denoising/tools/X-Restormer/requirements.txt  \
   && python setup.py develop  \
-  && sed -i '8s/.*/from torchvision.transforms.functional import rgb_to_grayscale/' /opt/conda/envs/xrestormer/lib/python3.10/site-packages/basicsr/data/degradations.py  \
+  && sed -i '8s/.*/from torchvision.transforms.functional import rgb_to_grayscale/' /opt/conda/envs/xrestormer/lib/python3.10/site-packages/basicsr/data/degradations.py
 
 # test conda environment
 RUN if ["$do_test" == "true"]; then cd /app/AgenticIR && sh test_env.sh; fi
-
-
-
-
-
-
-
-
-
-
-
 
 
