@@ -14,6 +14,7 @@ We use CLIP4CIR to extract embeddings and degradation sequences of low-quality i
 3. Service enabled by FastAPI, run 'test_api.sh' to test.
 
 **To-dos**:   
-1. Inference acceleration.    
+1. Inference acceleration.
+2. Deploy with Kubernetes and use MPS or Time-Slicing to improve GPUs utilization.  
 
 ![image](https://github.com/blackbean001/Auto-Image-Restoration/blob/main/pngs/pipeline.png)
