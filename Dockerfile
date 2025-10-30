@@ -5,14 +5,14 @@ FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-devel
 WORKDIR /app
 
 # Copy application files
-COPY AgenticIR /app
-COPY AgentApp /app
+#COPY ./AgenticIR ./
+#COPY ./CLIP4Cir ./
 
 # set environment
 ENV DEBIAN_FRONTEND=noninteractive
 
 # build postgresql environment
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* && apt-get update  \
+RUN apt-get update  \
   && apt-get install -y git vim  \
   && apt-get install -y postgresql postgresql-client  \
   && /etc/init.d/postgresql start  \
@@ -22,81 +22,96 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* && apt-get update  \
   && sed -i '90s/.*/local   all             postgres                                peer/' /etc/postgresql/14/main/pg_hba.conf \
   && apt-get install -y systemd
 
+# download model weights
+RUN pip install gdown==5.2.0  \
+  && cd /app/AgentApp/weights/defocus_deblurring/DRBNet && python download_ckpts.py  \
+  && cd /app/AgentApp/weights/defocus_deblurring/IFAN && sh download_ckpts.sh  \
+  && cd /app/AgentApp/weights/defocus_deblurring/Restormer && python download_ckpt.py  \
+  && cd /app/AgentApp/weights/dehazing/DehazeFormer && python download_ckpt.py  \
+  && cd /app/AgentApp/weights/dehazing/RIDCP_dehazing && python download_ckpts.py  \
+  && cd /app/AgentApp/weights/dehazing/X-Restormer && python download_ckpts.py  \
+  && cd /app/AgentApp/weights/dehazing/maxim && python download_ckpts.py \
+  && cd /app/AgentApp/weights/denoising/MPRNet && python download_ckpts.py \
+  && cd /app/AgentApp/weights/denoising/SwinIR && python download_ckpts.py \
+  && cd /app/AgentApp/weights/jpeg_compression_artifact_removal/FBCNN && sh download_ckpt.sh \
+  && cd /app/AgentApp/weights/super_resolution/DiffBIR && sh download_ckpt.sh \
+  && cd /app/AgentApp/weights/super_resolution/HAT && python download_ckpts.py
+
 # build environment
-RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76  \
+RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && rm /bin/sh && ln -s /bin/bash /bin/sh  \
 \
   && conda create -y -n clip4cir -y python=3.8  \
-  && /bin/bash -c "source activate clip4cir"  \
+  && source activate clip4cir  \
   && conda install -y -c pytorch pytorch=1.11.0 torchvision=0.12.0  \
   && conda install -y -c anaconda pandas=1.4.2 \
-  && pip install comet-ml urllib3==1.26.18  \
-#  && pip install git+https://github.com/openai/CLIP.git  \
+  && pip install -y comet-ml==3.21.0, urllib3==1.26.18  \
+  && pip install -y git+https://github.com/openai/CLIP.git  \
   && pip install pgvector  \
   && apt-get install -y libpq-dev && pip install psycopg2  \
 \
   && conda create -y -n agenticir python=3.10  \
-  && /bin/bash -c "source activate agenticir"  \
+  && source activate agenticir  \
   && apt-get install -y ffmpeg libsm6 libxext6  \
-  && cd ./AgenticIR && pip install -r installation/requirements.txt  \
-  && pip install git+https://github.com/openai/CLIP.git \
+  && cd /app/AgenticIR && pip install -r installation/requirements.txt  \
+  && pip install -y git+https://github.com/openai/CLIP.git \
   && pip install langgraph \
 \
   && conda create -y -n depictqa python=3.10  \
-  && /bin/bash -c "source activate depictqa"  \
-  && pip install -r ./AgenticIR/DepictQA/requirements.txt  \
-  && cd ./AgenticIR/DepictQA && sh launch_service.sh  \
+  && source activate depictqa  \
+  && pip install -r /app/AgenticIR/DepictQA/requirements.txt  \
+  && cd /app/AgenticIR/DepictQA && sh launch_service.sh  \
 \
   && conda create -y -n dehazeformer python=3.7  \
-  && /bin/bash -c "source activate dehazeformer"  \
-  && pip install -r ./AgenticIR/executor/dehazing/tools/DehazeFormer/requirements.txt  \
+  && source activate dehazeformer  \
+  && pip install -r /app/AgenticIR/executor/dehazing/tools/DehazeFormer/requirements.txt  \
 \
   && conda create -y -n diffbir python=3.10  \
-  && /bin/bash -c "source activate diffbir"  \
-  && pip install -r ./AgenticIR/executor/super_resolution/tools/DiffBIR/requirements.txt  \
+  && source activate diffbir  \
+  && pip install -r /app/AgenticIR/executor/super_resolution/tools/DiffBIR/requirements.txt  \
 \
   && conda create -y -n drbnet python=3.8  \
-  && /bin/bash -c "source activate drbnet"  \
-  && pip install -r ./AgenticIR/executor/defocus_deblurring/tools/DRBNet/requirements.txt  \
+  && source activate drbnet  \
+  && pip install -r /app/AgenticIR/executor/defocus_deblurring/tools/DRBNet/requirements.txt  \
 \
   && conda create -y -n fbcnn python=3.10.18  \
-  && /bin/bash -c "source activate fbcnn"  \
-  && pip install -r ./AgenticIR/executor/jpeg_compression_artifact_removal/tools/FBCNN/requirements.txt  \
+  && source activate fbcnn  \
+  && pip install -r /app/AgenticIR/executor/jpeg_compression_artifact_removal/tools/FBCNN/requirements.txt  \
 \
   && conda create -y -n hat python=3.10.18  \
-  && /bin/bash -c "source activate hat"  \
-  && pip install -r ./AgenticIR/executor/super_resolution/tools/HAT/requirements.txt  \
+  && source activate hat  \
+  && pip install -r /app/AgenticIR/executor/super_resolution/tools/HAT/requirements.txt  \
   && python setup.py develop  \
 \
   && conda create -y -n ifan python=3.8.20  \
-  && /bin/bash -c "source activate ifan"  \
-  && pip install -r ./AgenticIR/executor/defocus_deblurring/tools/IFAN/requirements.txt  \
+  && source activate ifan  \
+  && pip install -r /app/AgenticIR/executor/defocus_deblurring/tools/IFAN/requirements.txt  \
 \
   && conda create -y -n maxim python=3.10.18  \
-  && /bin/bash -c "source activate maxim"  \
-  && pip install -r ./AgenticIR/executor/denoising/tools/maxim/requirements.txt  \
+  && source activate maxim  \
+  && pip install -r /app/AgenticIR/executor/denoising/tools/maxim/requirements.txt  \
   && pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html  \
   && pip install .  \
 \
   && conda create -y -n mprnet python=3.7.16  \
-  && /bin/bash -c "source activate mprnet"  \
-  && pip install -r ./AgenticIR/executor/denoising/tools/MPRNet/requirements.txt  \
+  && source activate mprnet  \
+  && pip install -r /app/AgenticIR/executor/denoising/tools/MPRNet/requirements.txt  \
 \
   && conda create -y -n restormer python=3.7.16  \
-  && /bin/bash -c "source activate restormer"  \
-  && pip install -r ./AgenticIR/executor/denoising/tools/Restormer/requirements.txt  \
+  && source activate restormer  \
+  && pip install -r /app/AgenticIR/executor/denoising/tools/Restormer/requirements.txt  \
 \
   && conda create -y -n ridcp python=3.8.20  \
-  && /bin/bash -c "source activate ridcp"  \
-  && pip install -r ./AgenticIR/executor/dehazing/tools/RIDCP_dehazing/requirements.txt  \
+  && source activate ridcp  \
+  && pip install -r /app/AgenticIR/executor/dehazing/tools/RIDCP_dehazing/requirements.txt  \
 \
   && conda create -y -n swinir python=3.10.18  \
-  && /bin/bash -c "source activate swinir"  \
-  && pip install -r ./AgenticIR/executor/denoising/tools/SwinIR/requirements.txt  \
+  && source activate swinir  \
+  && pip install -r /app/AgenticIR/executor/denoising/tools/SwinIR/requirements.txt  \
 \
   && conda create -y -n xrestormer python=3.10.18  \
-  && /bin/bash -c "source activate xrestormer"  \
-  && pip install -r ./AgenticIR/executor/denoising/tools/X-Restormer/requirements.txt  \
+  && source activate xrestormer  \
+  && pip install -r /app/AgenticIR/executor/denoising/tools/X-Restormer/requirements.txt  \
   && python setup.py develop  \
   && sed -i '8s/.*/from torchvision.transforms.functional import rgb_to_grayscale/' /opt/conda/envs/xrestormer/lib/python3.10/site-packages/basicsr/data/degradations.py
 

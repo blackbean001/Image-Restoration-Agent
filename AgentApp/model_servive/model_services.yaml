@@ -1,0 +1,17 @@
+models:
+  brightening:
+    port: 8001
+    host: "0.0.0.0"
+    model_path: "/models/sentiment_analysis/v1/"
+    version: "1.0.0"
+    framework: "pytorch"
+    gpu: true
+    replicas: 2
+    healthcheck: "/health"
+    description: "Conduct image brightening"
+
+default:
+  log_level: "INFO"
+  base_port: 8000
+  timeout_seconds: 30
+
