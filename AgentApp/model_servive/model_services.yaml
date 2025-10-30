@@ -1,14 +1,31 @@
-models:
-  brightening:
-    port: 8001
+brightening:
+  port: 8001
+  host: "0.0.0.0"
+  model_path: ""
+  version: "1.0.0"
+  description: "Conduct image brightening - constant_shift, gamma_correction, histogram_equalization"
+
+defocus_deblurring:
+  DRBNet:
+    port: 8002
     host: "0.0.0.0"
-    model_path: "/models/sentiment_analysis/v1/"
-    version: "1.0.0"
-    framework: "pytorch"
-    gpu: true
-    replicas: 2
-    healthcheck: "/health"
-    description: "Conduct image brightening"
+    model_path:
+      dual: "/App/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/dual_images_defocus_deblurring.pth"
+      single: "/App/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/single_image_defocus_deblurring.pth"
+  
+  IFAN:
+    port: 8003
+    host: "0.0.0.0"
+    config: "config_IFAN"
+    mode: "IFAN"
+    project: "ImgRes_AgentApp"
+    ckpt_name: "IFAN.pytorch"
+    ckpt_abs: "/App/AgentApp/weights/defocus_deblurring/IFAN/IFAN.pytorch"
+  
+  Restormer:
+    port: 8004
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/defocus_deblurring/Restormer"
 
 default:
   log_level: "INFO"
