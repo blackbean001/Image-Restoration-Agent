@@ -27,6 +27,26 @@ defocus_deblurring:
     host: "0.0.0.0"
     weight_dir: "/App/AgentApp/weights/defocus_deblurring/Restormer"
 
+dehazing:
+  Dehazeformer:
+    port: 8005
+    host: "0.0.0.0"
+    model_name: "dehazeformer-b"
+    model_path: "/App/AgentApp/weights/dehazing/DehazeFormer/saved_models/indoor/dehazeformer-b.pth"
+  
+  RIDCP:
+    port: 8006
+    host: "0.0.0.0"
+    weight_path: "/App/AgentApp/weights/dehazing/RIDCP_dehazing/pretrained_RIDCP.pth"
+    alpha: "-21.25"
+  
+  XRestormer:
+    port: 8007
+    host: "0.0.0.0"
+    config: "/App/AgentApp/model_servive/dehazing/X-Restormer/xrestormer.yml"
+    model_path: "/App/AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth" 
+
+
 default:
   log_level: "INFO"
   base_port: 8000

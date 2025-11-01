@@ -1,0 +1,14 @@
+LICENSE
+README.md
+setup.py
+maxim/__init__.py
+maxim/predict.py
+maxim/run_eval.py
+maxim/test_maxim.py
+maxim.egg-info/PKG-INFO
+maxim.egg-info/SOURCES.txt
+maxim.egg-info/dependency_links.txt
+maxim.egg-info/requires.txt
+maxim.egg-info/top_level.txt
+maxim/models/__init__.py
+maxim/models/maxim.py
