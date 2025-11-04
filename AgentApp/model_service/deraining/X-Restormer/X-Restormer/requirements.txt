@@ -1,0 +1,11 @@
+basicsr
+numpy
+opencv-python==4.12.0.88
+requests
+torch==2.2.0
+torchvision
+einops
+thop
+torchstat
+torchsummary
+timm

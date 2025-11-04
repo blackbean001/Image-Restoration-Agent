@@ -11,8 +11,7 @@ defocus_deblurring:
     host: "0.0.0.0"
     model_path:
       dual: "/App/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/dual_images_defocus_deblurring.pth"
-      single: "/App/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/single_image_defocus_deblurring.pth"
-  
+      single: "/App/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/single_image_defocus_deblurring.pth"  
   IFAN:
     port: 8003
     host: "0.0.0.0"
@@ -20,8 +19,7 @@ defocus_deblurring:
     mode: "IFAN"
     project: "ImgRes_AgentApp"
     ckpt_name: "IFAN.pytorch"
-    ckpt_abs: "/App/AgentApp/weights/defocus_deblurring/IFAN/IFAN.pytorch"
-  
+    ckpt_abs: "/App/AgentApp/weights/defocus_deblurring/IFAN/IFAN.pytorch"  
   Restormer:
     port: 8004
     host: "0.0.0.0"
@@ -33,19 +31,72 @@ dehazing:
     host: "0.0.0.0"
     model_name: "dehazeformer-b"
     model_path: "/App/AgentApp/weights/dehazing/DehazeFormer/saved_models/indoor/dehazeformer-b.pth"
-  
   RIDCP:
     port: 8006
     host: "0.0.0.0"
     weight_path: "/App/AgentApp/weights/dehazing/RIDCP_dehazing/pretrained_RIDCP.pth"
     alpha: "-21.25"
-  
   XRestormer:
     port: 8007
     host: "0.0.0.0"
     config: "/App/AgentApp/model_servive/dehazing/X-Restormer/xrestormer.yml"
-    model_path: "/App/AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth" 
+    model_path: "/App/AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth"
+  MAXIM:
+    port: 8008
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/dehazing/maxim"
 
+denoising:
+  Restormer:
+    port: 8009
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/defocus_deblurring/Restormer"
+  XRestormer:
+    port: 8010
+    host: "0.0.0.0"
+    config: "/App/AgentApp/model_servive/denoising/X-Restormer/xrestormer.yml"
+    model_path: "/App/AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
+  MAXIM:
+    port: 8011
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/denoising/maxim"
+  MPRNet:
+    port: 8012
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/denoising/MPRNet"
+  SwinIR:
+    port: 8013
+    host: "0.0.0.0"
+    model_path: "/App/AgentApp/weights/denoising/SwinIR/005_colorDN_DFWB_s128w8_SwinIR-M_noise15.pth"
+
+deraining:
+  MPRNet:
+    port: 8014
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/deraining/MPRNet"
+  Restormer:
+    port: 8015
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/deraining/Restormer"
+  XRestormer:
+    port: 8016
+    host: "0.0.0.0"
+    config: "/App/AgentApp/model_servive/deraining/X-Restormer/xrestormer.yml"
+    model_path: "/App/AgentApp/weights/deraining/X-Restormer/Deraining/net_g_155000.pth"
+  MAXIM:
+    port: 8017
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/deraining/maxim"
+
+jpeg_compression_artifact_removal:
+  SwinIR:
+    port: 8018
+    host: "0.0.0.0"
+    model_path: "/App/AgentApp/weights/denoising/SwinIR/006_colorCAR_DFWB_s126w7_SwinIR-M_jpeg40.pth"
+  FBCNN:
+    port: 8019
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/jpeg_compression_artifact_removal/FBCNN"
 
 default:
   log_level: "INFO"

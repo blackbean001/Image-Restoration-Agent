@@ -1,0 +1,6 @@
+torch==2.2.2
+numpy==1.23.4
+opencv-python
+torchvision==0.17.2
+matplotlib==3.10.5
+requests==2.32.4

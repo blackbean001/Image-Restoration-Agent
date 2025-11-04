@@ -1,0 +1,6 @@
+torch==2.8.0
+numpy
+opencv-python==4.12.0.88
+torchvision==0.23.0
+requests
+timm
