@@ -27,9 +27,9 @@ def load_model_configs(config_path="../model_services.yaml"):
 
 cfg = load_model_configs()
 
-port = cfg["denoising"]["Restormer"]["port"]
-host = cfg["denoising"]["Restormer"]["host"]
-weight_dir = cfg["denoising"]["Restormer"]["weight_dir"]
+port = cfg["denoising"]["MPRNet"]["port"]
+host = cfg["denoising"]["MPRNet"]["host"]
+weight_dir = cfg["denoising"]["MPRNet"]["weight_dir"]
 
 
 UPLOAD_FOLDER = 'uploads'

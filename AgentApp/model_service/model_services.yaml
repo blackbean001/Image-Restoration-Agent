@@ -98,6 +98,46 @@ jpeg_compression_artifact_removal:
     host: "0.0.0.0"
     weight_dir: "/App/AgentApp/weights/jpeg_compression_artifact_removal/FBCNN"
 
+motion_deblurring:
+  MPRNet:
+    port: 8020
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/motion_deblurring/MPRNet"
+  Restormer:
+    port: 8021
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/motion_deblurring/Restormer"
+  XRestormer:
+    port: 8022
+    host: "0.0.0.0"
+    config: "/App/AgentApp/model_servive/motion_deblurring/X-Restormer/xrestormer.yml"
+    model_path: "/App/AgentApp/weights/motion_deblurring/X-Restormer/Deraining/net_g_155000.pth"
+  MAXIM:
+    port: 8023
+    host: "0.0.0.0"
+    weight_dir: "/App/AgentApp/weights/motion_deblurring/maxim"
+
+super_resolution:
+  SwinIR:
+    port: 8024
+    host: "0.0.0.0"
+    model_path: "/App/AgentApp/weights/super_resolution/SwinIR/003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_PSNR.pth"
+  XRestormer:
+    port: 8025
+    host: "0.0.0.0"
+    config: "/App/AgentApp/model_servive/super_resolution/X-Restormer/xrestormer.yml"
+    model_path: "/App/AgentApp/weights/super_resolution/X-Restormer/SR/net_g_latest.pth"
+  DiffBIR:
+    port: 8026
+    host: "0.0.0.0"
+    config: "/App/AgentApp/model_servive/super_resolution/DiffBIR/diffbir.yml"
+    model_path: "/App/AgentApp/weights/super_resolution/DiffBIR/v1_general.pth"
+  HAT:
+    port: 8027
+    host: "0.0.0.0"
+    config: "/App/AgentApp/model_servive/super_resolution/HAT/hat.yml"
+    model_path: "/App/AgentApp/weights/super_resolution/HAT/HAT-L_SRx4_ImageNet-pretrain.pth"
+
 default:
   log_level: "INFO"
   base_port: 8000
