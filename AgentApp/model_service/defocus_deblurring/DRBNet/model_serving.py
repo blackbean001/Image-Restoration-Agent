@@ -1,4 +1,5 @@
 import os
+import yaml
 import sys
 sys.path.append("./DRBNet")
 
@@ -10,7 +11,7 @@ from ptflops import get_model_complexity_info
 from util.util import *
 from pathlib import Path
 import time
-import sys
+import io
 import lpips
 from glob import glob
 from natsort import natsorted
@@ -21,10 +22,11 @@ import base64
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import logging
+from PIL import Image
 
 
 # load config
-def load_model_configs(config_path="../model_services.yaml"):
+def load_model_configs(config_path="../../model_services.yaml"):
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     return config
@@ -35,13 +37,12 @@ host = cfg["defocus_deblurring"]["DRBNet"]["host"]
 single_ckpt = cfg["defocus_deblurring"]["DRBNet"]["model_path"]["single"]
 dual_ckpt = cfg["defocus_deblurring"]["DRBNet"]["model_path"]["dual"]
 
+# app
+app = Flask(__name__)
 
 # configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-single_ckpt = "/App/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/single/single_image_defocus_deblurring.pth"
-double_ckpt = "/App/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/dual_images_defocus_deblurring.pth"
 
 # global model config
 class ModelConfig:
@@ -220,7 +221,7 @@ def index():
 
 if __name__ == '__main__':
     logger.info("Starting DRBNet Inference Service...")
-    load_models()
+    load_model()
     
     app.run(host=host, port=port, debug=False)
 

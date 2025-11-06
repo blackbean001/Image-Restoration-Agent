@@ -74,7 +74,8 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n drbnet python=3.8  \
   && source activate drbnet  \
-  && pip install flask flask_cors  \
+  && pip install flask flask_cors ptflops lpips pyyaml \
+  && apt-get install jq \
   && pip install -r /app/AgenticIR/executor/defocus_deblurring/tools/DRBNet/requirements.txt  \
 \
   && conda create -y -n fbcnn python=3.10.18  \
@@ -90,7 +91,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n ifan python=3.8.20  \
   && source activate ifan  \
-  && pip install flask flask_cors  \
+  && pip install flask flask_cors ptflops lpips pyyaml \
   && pip install -r /app/AgenticIR/executor/defocus_deblurring/tools/IFAN/requirements.txt  \
 \
   && conda create -y -n maxim python=3.10.18  \
@@ -102,12 +103,12 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n mprnet python=3.7.16  \
   && source activate mprnet  \
-  && pip install flask flask_cors  \
+  && pip install flask flask_cors ptflops lpips pyyaml \
   && pip install -r /app/AgenticIR/executor/denoising/tools/MPRNet/requirements.txt  \
 \
   && conda create -y -n restormer python=3.7.16  \
   && source activate restormer  \
-  && pip install flask flask_cors  \
+  && pip install flask flask_cors ptflops lpips pyyaml \
   && pip install -r /app/AgenticIR/executor/denoising/tools/Restormer/requirements.txt  \
 \
   && conda create -y -n ridcp python=3.8.20  \

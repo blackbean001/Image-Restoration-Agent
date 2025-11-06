@@ -1,21 +1,24 @@
-from flask import Flask, request, jsonify, send_file
-
 import torch
 import torchvision.utils as vutils
 import torch.nn.functional as F
 
 import json
 import time
+import io
 import os
 import sys
 sys.path.append("./IFAN")
 
 import numpy as np
+import importlib
+import inspect
+import yaml
 from pathlib import Path
 import gc
 import math
 import random
 import traceback
+import cv2
 
 from utils import *
 from models import create_model
@@ -24,16 +27,21 @@ import models.archs.LPIPS as LPIPS
 from data_loader.utils import load_file_list, read_frame, refine_image
 from ckpt_manager import CKPT_Manager
 
+from flask import Flask, request, jsonify, send_file
 
+
+# app
 app = Flask(__name__)
+
 
 # save global model and config
 model_network = None
 model_config = None
 device = None
 
+
 # load config
-def load_model_configs(config_path="../model_services.yaml"):
+def load_model_configs(config_path="../../model_services.yaml"):
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     return config
@@ -70,8 +78,10 @@ def load_model(config):
     return network, ckpt_name
 
 
-def preprocess_image(image_bytes, refine_val=4, rotate=None):
+def preprocess_image(image_bytes, norm_val, refine_val, rotate=None):
+
     nparr = np.frombuffer(image_bytes, np.uint8)
+
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -122,14 +132,20 @@ def deblur_image():
         
         image_bytes = file.read()
         
-        norm_val = float(request.form.get('norm_val', model_config.norm_val))
-        refine_val = int(request.form.get('refine_val', model_config.refine_val))
         output_format = request.form.get('format', 'png')  # png or jpg
         
-        input_tensor = preprocess_image(image_bytes, norm_val, refine_val)
+        norm_val = model_config.norm_val
+        refine_val = model_config.refine_val
         
+        if model_config.EVAL.data == 'PixelDP':
+            rotate = cv2.ROTATE_90_COUNTERCLOCKWISE
+        else:
+            rotate = None
+
+        input_tensor = preprocess_image(image_bytes, norm_val, refine_val)
+
         with torch.no_grad():
-            out = model_network(input_tensor, is_train=False)
+            out = model_network(C=input_tensor, is_train=False)
             
             if model_config.cuda:
                 torch.cuda.synchronize()
@@ -174,10 +190,16 @@ def deblur_image_dual():
         left_bytes = request.files['left'].read()
         right_bytes = request.files['right'].read()
         
-        norm_val = float(request.form.get('norm_val', model_config.norm_val))
-        refine_val = int(request.form.get('refine_val', model_config.refine_val))
         output_format = request.form.get('format', 'png')
         
+        norm_val = model_config.norm_val
+        refine_val = model_config.refine_val
+        
+        if model_config.EVAL.data == 'PixelDP':
+            rotate = cv2.ROTATE_90_COUNTERCLOCKWISE
+        else:
+            rotate = None
+
         C = preprocess_image(center_bytes, norm_val, refine_val)
         L = preprocess_image(left_bytes, norm_val, refine_val)
         R = preprocess_image(right_bytes, norm_val, refine_val)
@@ -230,6 +252,7 @@ if __name__ == "__main__":
     ckpt_abs = cfg["defocus_deblurring"]["IFAN"]["ckpt_abs"]
     config_name = cfg["defocus_deblurring"]["IFAN"]["config"]
     mode = cfg["defocus_deblurring"]["IFAN"]["mode"]
+    network = cfg["defocus_deblurring"]["IFAN"]["network"]
     project = cfg["defocus_deblurring"]["IFAN"]["project"]
 
     config_lib = importlib.import_module(f'configs.{config_name}')
@@ -238,8 +261,9 @@ if __name__ == "__main__":
     config.cuda = torch.cuda.is_available()
     config.device = 'cuda' if config.cuda else 'cpu'
     
-    config.EVAL.ckpt_name = args.ckpt_name
-    config.EVAL.ckpt_abs_name = args.ckpt_abs
+    config.network = network
+    config.EVAL.ckpt_name = ckpt_name
+    config.EVAL.ckpt_abs_name = ckpt_abs
     config.EVAL.load_ckpt_by_score = False
     
     initialize_service(config)
