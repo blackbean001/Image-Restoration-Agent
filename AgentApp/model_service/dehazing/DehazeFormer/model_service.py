@@ -4,6 +4,7 @@ sys.path.append("DehazeFormer")
 import os
 import io
 import cv2
+import yaml
 import numpy as np
 import torch
 import torch.nn as nn
@@ -11,7 +12,7 @@ from flask import Flask, request, send_file, jsonify
 from collections import OrderedDict
 from PIL import Image
 
-from utils import AverageMeter, write_img, chw_to_hwc
+from utils import AverageMeter, write_img, chw_to_hwc, hwc_to_chw
 from datasets.loader import PairLoader, SingleLoader
 
 from models import *
@@ -39,9 +40,10 @@ device = None
 
 
 def read_img_from_bytes(img_bytes):
-    nparr = np.frombuffer(img_bytes)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    return img[:, :, ::-1].astype('float32') / 255.0
+    img = Image.open(io.BytesIO(img_bytes))
+    img = img.convert('RGB')
+    img = np.array(img).astype('float32') / 255.0
+    return img
 
 
 def write_img_to_bytes(img):
@@ -69,17 +71,17 @@ def process_image(img_bytes):
     img = img * 2 - 1
     
     img_chw = hwc_to_chw(img)
-    
+
     img_tensor = torch.from_numpy(img_chw).unsqueeze(0).to(device)
     
     model.eval()
+
     with torch.no_grad():
         output = model(img_tensor).clamp_(-1, 1)
-        
         output = output * 0.5 + 0.5
     
     out_img = chw_to_hwc(output.detach().cpu().squeeze(0).numpy())
-    
+
     return out_img
 
 
@@ -104,11 +106,10 @@ def dehaze():
             return jsonify({'error': 'No selected file'}), 400
         
         img_bytes = file.read()
-        
+
         output_img = process_image(img_bytes)
-        
+
         output_bytes = write_img_to_bytes(output_img)
-        
         if output_bytes is None:
             return jsonify({'error': 'Failed to encode output image'}), 500
         
@@ -187,20 +188,5 @@ if __name__ == "__main__":
     app.run(host=host,
             port=port,
             debug=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
