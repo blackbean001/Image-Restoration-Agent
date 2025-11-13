@@ -40,7 +40,7 @@ dehazing:
   XRestormer:
     port: 8007
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/dehazing/X-Restormer/xrestormer.yml"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/dehazing/X-Restormer/xrestormer.yml"
     model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth"
   MAXIM:
     port: 8008
@@ -55,8 +55,8 @@ denoising:
   XRestormer:
     port: 8010
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/denoising/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/App/AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/denoising/X-Restormer/xrestormer.yml"
+    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
   MAXIM:
     port: 8011
     host: "0.0.0.0"
@@ -82,7 +82,7 @@ deraining:
   XRestormer:
     port: 8016
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/deraining/X-Restormer/xrestormer.yml"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/deraining/X-Restormer/xrestormer.yml"
     model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/deraining/X-Restormer/Deraining/net_g_155000.pth"
   MAXIM:
     port: 8017

@@ -7,7 +7,7 @@ padding_size: 64
 
 # dataset and data loader settings
 datasets:
-  test_1:
+  test:
     name: test
     type: SingleImageDataset
     dataroot_lq: ~
@@ -40,7 +40,7 @@ path:
   pretrain_network_g: X-Restormer/experiments/pretrained/derain_155k.pth
   strict_load_g: true
   resume_state: ~
-  results: ~
+  results: results
 # validation settings
 val:
   save_img: true

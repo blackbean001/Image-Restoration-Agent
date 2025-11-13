@@ -6,6 +6,7 @@ import importlib
 import io
 import os
 import base64
+import yaml
 from io import BytesIO
 
 from flask import Flask, request, jsonify, send_file
@@ -91,17 +92,22 @@ def mod_padding_symmetric(image, factor=64):
     return image
 
 
-def get_params(csdasdkpt_path):
-    if ckpt_path in params_cache:
-        return params_cache[ckpt_path]
+def get_params(ckpt_path):
+    try:
+        if ckpt_path in params_cache:
+            return params_cache[ckpt_path]
     
-    with tf.io.gfile.GFile(ckpt_path, 'rb') as f:
-        data = f.read()
-    values = np.load(io.BytesIO(data))
-    params = recover_tree(*zip(*values.items()))
-    params = params['opt']['target']
+        with tf.io.gfile.GFile(ckpt_path, 'rb') as f:
+            data = f.read()
+        values = np.load(io.BytesIO(data))
+        params = recover_tree(*zip(*values.items()))
+        params = params['opt']['target']
     
-    params_cache[ckpt_path] = params
+        params_cache[ckpt_path] = params
+        print("Load model successfully.")
+    except Exception as e:
+        print(f"Failed loading model: {e}")
+
     return params
 
 
@@ -165,10 +171,10 @@ def get_model(task):
 
 def process_image(input_img, task, geometric_ensemble=False, ensemble_times=8):
     model = get_model(task)
-
+    
     ckpt_path = os.path.join(weight_dir, _MODEL_PATH_DICT[task])
     params = get_params(ckpt_path)
-    
+
     height, width = input_img.shape[0], input_img.shape[1]
     
     input_img = make_shape_even(input_img)
@@ -180,8 +186,8 @@ def process_image(input_img, task, geometric_ensemble=False, ensemble_times=8):
         input_img = augment_image(input_img, ensemble_times)
     else:
         input_img = np.expand_dims(input_img, axis=0)
-    
     preds = model.apply({'params': flax.core.freeze(params)}, input_img)
+
     if isinstance(preds, list):
         preds = preds[-1]
         if isinstance(preds, list):
@@ -198,7 +204,7 @@ def process_image(input_img, task, geometric_ensemble=False, ensemble_times=8):
     w_start = new_width // 2 - width_even // 2
     w_end = w_start + width
     preds = preds[h_start:h_end, w_start:w_end, :]
-    
+
     return preds
 
 
@@ -231,7 +237,7 @@ def predict():
         geometric_ensemble = request.form.get('geometric_ensemble', 'false').lower() == 'true'
         ensemble_times = int(request.form.get('ensemble_times', 8))
         return_format = request.form.get('return_format', 'image')
-        
+
         if task not in _MODEL_VARIANT_DICT:
             return jsonify({
                 'error': f'Invalid task. Must be one of {list(_MODEL_VARIANT_DICT.keys())}'
@@ -243,11 +249,10 @@ def predict():
         output_img = process_image(
             input_img, 
             task, 
-            ckpt_path, 
             geometric_ensemble, 
             ensemble_times
         )
-        
+
         output_img = np.clip(output_img, 0., 1.) * 255.
         output_img = output_img.astype(np.uint8)
         output_pil = Image.fromarray(output_img)
@@ -265,6 +270,7 @@ def predict():
             img_io = BytesIO()
             output_pil.save(img_io, 'PNG')
             img_io.seek(0)
+
             return send_file(img_io, mimetype='image/png')
         
     except Exception as e:
@@ -277,11 +283,7 @@ def batch_predict():
         if 'task' not in request.form:
             return jsonify({'error': 'Task parameter is required'}), 400
         
-        if 'ckpt_path' not in request.form:
-            return jsonify({'error': 'ckpt_path parameter is required'}), 400
-        
         task = request.form['task']
-        ckpt_path = request.form['ckpt_path']
         geometric_ensemble = request.form.get('geometric_ensemble', 'false').lower() == 'true'
         ensemble_times = int(request.form.get('ensemble_times', 8))
         
@@ -304,7 +306,6 @@ def batch_predict():
                 output_img = process_image(
                     input_img, 
                     task, 
-                    ckpt_path, 
                     geometric_ensemble, 
                     ensemble_times
                 )

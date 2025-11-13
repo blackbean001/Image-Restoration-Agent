@@ -234,11 +234,6 @@ def batch_process():
     return jsonify({'results': results})
 
 
-def cleanup():
-    if osp.exists(app.config['UPLOAD_FOLDER']):
-        shutil.rmtree(app.config['UPLOAD_FOLDER'])
-
-
 if __name__ == "__main__":
     try:
         initialize_model(opt_config)
@@ -250,9 +245,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error initializing model: {str(e)}")
         raise
-
-    finally:
-        cleanup()
 
 
 

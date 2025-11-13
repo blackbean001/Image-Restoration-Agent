@@ -118,7 +118,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n swinir python=3.10.18  \
   && source activate swinir  \
-  && pip install flask flask_cors  \
+  && pip install flask flask_cors ptflops lpips pyyaml \
   && pip install -r /app/AgenticIR/executor/denoising/tools/SwinIR/requirements.txt  \
 \
   && conda create -y -n xrestormer python=3.10.18  \
