@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms.functional as TF
 from PIL import Image
+import yaml
 import os
 from runpy import run_path
 from skimage import img_as_ubyte
@@ -20,17 +21,19 @@ from datetime import datetime
 
 
 # load config
-def load_model_configs(config_path="../model_services.yaml"):
+def load_model_configs(config_path="../../model_services.yaml"):
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     return config
 
 cfg = load_model_configs()
 
-port = cfg["deraining"]["Restormer"]["port"]
-host = cfg["deraining"]["Restormer"]["host"]
-weight_dir = cfg["deraining"]["Restormer"]["weight_dir"]
+port = cfg["deraining"]["MPRNet"]["port"]
+host = cfg["deraining"]["MPRNet"]["host"]
+weight_dir = cfg["deraining"]["MPRNet"]["weight_dir"]
 
+# app
+app = Flask(__name__)
 
 UPLOAD_FOLDER = 'uploads'
 RESULT_FOLDER = 'results'
@@ -69,7 +72,7 @@ def get_model(task):
     if task in models_cache:
         return models_cache[task]
     
-    load_file = run_path(os.path.join(task, "MPRNet.py"))
+    load_file = run_path(os.path.join("MPRNet", task, "MPRNet.py"))
     model = load_file['MPRNet']()
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -83,6 +86,7 @@ def get_model(task):
     model.eval()
     
     models_cache[task] = model
+
     return model
 
 
@@ -100,7 +104,7 @@ def process_image(image_path, task, img_multiple_of=8):
     padh = H - h if h % img_multiple_of != 0 else 0
     padw = W - w if w % img_multiple_of != 0 else 0
     input_ = F.pad(input_, (0, padw, 0, padh), 'reflect')
-    
+
     with torch.no_grad():
         restored = model(input_)
     
@@ -110,7 +114,7 @@ def process_image(image_path, task, img_multiple_of=8):
     restored = restored[:, :, :h, :w]
     restored = restored.permute(0, 2, 3, 1).cpu().detach().numpy()
     restored = img_as_ubyte(restored[0])
-    
+
     return restored
 
 
@@ -212,24 +216,5 @@ if __name__ == '__main__':
     app.run(host=host,
             port=port,
             debug=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -1,3 +1,6 @@
+import sys
+sys.path.append("X-Restormer")
+
 from flask import Flask, request, jsonify, send_file
 from werkzeug.utils import secure_filename
 import os
@@ -24,7 +27,6 @@ from basicsr.models.sr_model import SRModel
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.config['UPLOAD_FOLDER'] = tempfile.mkdtemp()
 
 
 # load config
@@ -34,10 +36,10 @@ def load_model_configs(config_path="../../model_services.yaml"):
     return config
 
 cfg = load_model_configs()
-port = cfg["dehazing"]["XRestormer"]["port"]
-host = cfg["dehazing"]["XRestormer"]["host"]
-opt_config = cfg["dehazing"]["XRestormer"]["config"]
-model_path = cfg["dehazing"]["XRestormer"]["model_path"]
+port = cfg["denoising"]["XRestormer"]["port"]
+host = cfg["denoising"]["XRestormer"]["host"]
+opt_config = cfg["denoising"]["XRestormer"]["config"]
+model_path = cfg["denoising"]["XRestormer"]["model_path"]
 
 
 # global configuration
@@ -55,7 +57,8 @@ def initialize_model(opt_config):
     global model, opt, logger
 
     opt = load_config(opt_config)
-    
+    print("opt: ", opt)
+
     opt['path']['pretrain_network_g'] = model_path
 
     opt['dist'] = False
@@ -75,11 +78,11 @@ def initialize_model(opt_config):
     for key, val in opt['path'].items():
         if (val is not None) and ('resume_state' in key or 'pretrain_network' in key):
             opt['path'][key] = osp.expanduser(val)
-
-    results_root = osp.join(opt['path'].get('results', './results'), opt['name'])
-    opt['path']['results_root'] = results_root
-    opt['path']['log'] = results_root
-    opt['path']['visualization'] = osp.join(results_root, 'visualization')
+    
+    results_root = opt['path'].get('results', './results')
+    opt['path']['results_root'] = osp.join(results_root, opt["name"])
+    opt['path']['log'] = osp.join(results_root, opt["name"])
+    opt['path']['visualization'] = osp.join(results_root, opt["name"])
 
     make_exp_dirs(opt)
 
@@ -100,17 +103,21 @@ def process_image(image_path, output_path):
     if model is None:
         raise ValueError("Model not initialized")
     
-    temp_dataset_opt = opt['datasets']['test'].copy()
-    temp_dataset_opt['dataroot_lq'] = osp.dirname(image_path)
-    temp_dataset_opt['io_backend'] = {'type': 'disk'}
-    
+    try:
+        temp_dataset_opt = opt['datasets']['test'].copy()
+        temp_dataset_opt['dataroot_lq'] = osp.dirname(image_path)
+
+        temp_dataset_opt['io_backend'] = {'type': 'disk'}
+    except Exception as e:
+        logger.error(f"Error creating data: {str(e)}")
+
     try:
         from basicsr.data.paired_image_dataset import PairedImageDataset
         from torch.utils.data import DataLoader
-        
+        print("temp_dataset_opt: ", temp_dataset_opt)
+
         test_set = build_dataset(temp_dataset_opt)
         test_loader = DataLoader(test_set, batch_size=1, shuffle=False, num_workers=0)
-        
         model.validation(test_loader, current_iter=opt['name'], 
                         tb_logger=None, save_img=True)
         
@@ -137,34 +144,35 @@ def process():
     if 'image' not in request.files:
         return jsonify({'error': 'No image file provided'}), 400
     
-    file = request.files['image']
-    if file.filename == '':
+    fileStorage = request.files['image']
+
+    if fileStorage.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
     
     try:
-        filename = secure_filename(file.filename)
-        input_path = osp.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(input_path)
+        filename = secure_filename(fileStorage.filename)
         
-        output_dir = osp.join(opt['path']['visualization'], 'test')
+        output_dir = "results"
+
         os.makedirs(output_dir, exist_ok=True)
         output_path = osp.join(output_dir, filename)
+
+        success = process_image(osp.join('inputs', filename), output_path)
         
-        success = process_image(input_path, output_path)
-        
-        if success and osp.exists(output_path):
-            with open(output_path, 'rb') as f:
+        # the path is determined by basicsr
+        output_image_path = f"{output_dir}/{opt['name']}/test/{filename.split('.')[0]}.png"
+        if success and osp.exists(output_image_path):
+            with open(output_image_path, 'rb') as f:
                 img_data = f.read()
             
-            os.remove(input_path)
-            
+            # the image file appears both at output_image_path and f'restored_{filename}'
             return send_file(
                 BytesIO(img_data),
                 mimetype='image/png',
                 as_attachment=True,
                 download_name=f'restored_{filename}'
             )
-            
+
         else:
             return jsonify({'error': 'Image processing failed'}), 500
             
@@ -173,88 +181,16 @@ def process():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/batch_process', methods=['POST'])
-def batch_process():
-    if model is None:
-        return jsonify({'error': 'Model not initialized'}), 500
-    
-    if 'images' not in request.files:
-        return jsonify({'error': 'No image files provided'}), 400
-    
-    files = request.files.getlist('images')
-    results = []
-    
-    for file in files:
-        if file.filename == '':
-            continue
-            
-        try:
-            filename = secure_filename(file.filename)
-            input_path = osp.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(input_path)
-            
-            output_dir = osp.join(opt['path']['visualization'], 'test')
-            os.makedirs(output_dir, exist_ok=True)
-            output_path = osp.join(output_dir, filename)
-            
-            success = process_image(input_path, output_path)
-            
-            if success and osp.exists(output_path):
-                with open(output_path, 'rb') as f:
-                    img_data = f.read()
-                img_base64 = base64.b64encode(img_data).decode('utf-8')
-                results.append({
-                    'filename': filename,
-                    'success': True,
-                    'image': img_base64
-                })
-            else:
-                results.append({
-                    'filename': filename,
-                    'success': False,
-                    'error': 'Processing failed'
-                })
-            
-            os.remove(input_path)
-            
-        except Exception as e:
-            results.append({
-                'filename': file.filename,
-                'success': False,
-                'error': str(e)
-            })
-    
-    return jsonify({'results': results})
-
-
-def cleanup():
-    if osp.exists(app.config['UPLOAD_FOLDER']):
-        shutil.rmtree(app.config['UPLOAD_FOLDER'])
-
-
 if __name__ == "__main__":
     try:
         initialize_model(opt_config)
         print("Model initialized successfully!")
-        print(f"Starting Flask server on {args.host}:{args.port}")
+        print(f"Starting Flask server on {host}:{port}")
 
         app.run(host=host, port=port, debug=False)
 
     except Exception as e:
         print(f"Error initializing model: {str(e)}")
         raise
-
-    finally:
-        cleanup()
-
-
-
-
-
-
-
-
-
-
 
 

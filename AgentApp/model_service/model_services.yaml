@@ -40,7 +40,7 @@ dehazing:
   XRestormer:
     port: 8007
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/dehazing/X-Restormer/xrestormer.yml"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/dehazing/X-Restormer/xrestormer.yml"
     model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth"
   MAXIM:
     port: 8008
@@ -55,8 +55,8 @@ denoising:
   XRestormer:
     port: 8010
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/denoising/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/App/AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/denoising/X-Restormer/xrestormer.yml"
+    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
   MAXIM:
     port: 8011
     host: "0.0.0.0"
@@ -82,7 +82,7 @@ deraining:
   XRestormer:
     port: 8016
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/deraining/X-Restormer/xrestormer.yml"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/deraining/X-Restormer/xrestormer.yml"
     model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/deraining/X-Restormer/Deraining/net_g_155000.pth"
   MAXIM:
     port: 8017
@@ -93,7 +93,7 @@ jpeg_compression_artifact_removal:
   SwinIR:
     port: 8018
     host: "0.0.0.0"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/denoising/SwinIR/006_colorCAR_DFWB_s126w7_SwinIR-M_jpeg40.pth"
+    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/jpeg_compression_artifact_removal/SwinIR/006_colorCAR_DFWB_s126w7_SwinIR-M_jpeg40.pth"
   FBCNN:
     port: 8019
     host: "0.0.0.0"
@@ -111,8 +111,8 @@ motion_deblurring:
   XRestormer:
     port: 8022
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/motion_deblurring/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/motion_deblurring/X-Restormer/Deraining/net_g_155000.pth"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/motion_deblurring/X-Restormer/xrestormer.yml"
+    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/motion_deblurring/X-Restormer/Deblurring/net_g_latest.pth"
   MAXIM:
     port: 8023
     host: "0.0.0.0"

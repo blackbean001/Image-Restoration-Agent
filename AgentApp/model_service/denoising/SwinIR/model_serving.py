@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import os
 import torch
+import yaml
 import io
 import base64
 from PIL import Image
@@ -14,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 
 # load config
-def load_model_configs(config_path="../model_services.yaml"):
+def load_model_configs(config_path="../../model_services.yaml"):
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     return config
@@ -118,12 +119,16 @@ def load_model(task, scale=1, noise=15, jpeg=40, large_model=False):
             model = model.to(device)
             models[model_key] = model
         except Exception as e:
+            print(f"Error loading model: {str(e)}")
             return None, f"Error loading model: {str(e)}"
     
+    print("Load model success: ", model_path)
+
     return models[model_key], None
 
 
 def process_image(img_lq, model, scale, window_size, tile=None, tile_overlap=32):
+
     img_lq = np.transpose(
         img_lq if img_lq.shape[2] == 1 else img_lq[:, :, [2, 1, 0]], 
         (2, 0, 1)
@@ -147,19 +152,18 @@ def process_image(img_lq, model, scale, window_size, tile=None, tile_overlap=32)
             w_idx_list = list(range(0, w - tile_size, stride)) + [w - tile_size]
             E = torch.zeros(b, c, h * scale, w * scale).type_as(img_lq)
             W = torch.zeros_like(E)
-            
+
             for h_idx in h_idx_list:
                 for w_idx in w_idx_list:
                     in_patch = img_lq[..., h_idx:h_idx + tile_size, w_idx:w_idx + tile_size]
                     out_patch = model(in_patch)
                     out_patch_mask = torch.ones_like(out_patch)
-                    
                     E[..., h_idx * scale:(h_idx + tile_size) * scale, 
                       w_idx * scale:(w_idx + tile_size) * scale].add_(out_patch)
                     W[..., h_idx * scale:(h_idx + tile_size) * scale, 
                       w_idx * scale:(w_idx + tile_size) * scale].add_(out_patch_mask)
             output = E.div_(W)
-        
+
         output = output[..., :h_old * scale, :w_old * scale]
     
     output = output.data.squeeze().float().cpu().clamp_(0, 1).numpy()
@@ -229,6 +233,8 @@ def predict():
         
         output = process_image(img_lq, model, scale, window_size, tile, tile_overlap)
         
+        print("return_type: ", return_type)
+
         if return_type == 'base64':
             _, buffer = cv2.imencode('.png', output)
             img_base64 = base64.b64encode(buffer).decode('utf-8')
@@ -241,9 +247,11 @@ def predict():
             output_filename = secure_filename(f"output_{file.filename}")
             output_path = os.path.join(OUTPUT_FOLDER, output_filename)
             cv2.imwrite(output_path, output)
+            print("Save image to: ", output_path)
             return send_file(output_path, mimetype='image/png')
-    
+
     except Exception as e:
+        print("error: ", str(e))
         return jsonify({'error': str(e)}), 500
 
 

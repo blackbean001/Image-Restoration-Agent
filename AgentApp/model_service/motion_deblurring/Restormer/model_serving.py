@@ -1,8 +1,11 @@
+import sys
+sys.path.append("Restormer/")
 
 from flask import Flask, request, jsonify, send_file
 import torch
 import torch.nn.functional as F
 import os
+import yaml
 from runpy import run_path
 from skimage import img_as_ubyte
 import cv2
@@ -16,12 +19,15 @@ import traceback
 
 app = Flask(__name__)
 
+TASK = "Motion_Deblurring"
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp'}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+
 
 SUPPORTED_TASKS = [
     'Motion_Deblurring',
@@ -32,8 +38,9 @@ SUPPORTED_TASKS = [
     'Gaussian_Color_Denoising'
 ]
 
+
 # load config
-def load_model_configs(config_path="../model_services.yaml"):
+def load_model_configs(config_path="../../model_services.yaml"):
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     return config
@@ -49,8 +56,10 @@ class RestormerService:
         self.models = {}
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.img_multiple_of = 8
-        logger.info(f"Use device: {self.device}")
+        self.model = self.load_model(TASK)
 
+        logger.info(f"Use device: {self.device}")
+        
     def get_weights_and_parameters(self, task):
         parameters = {
             'inp_channels': 3,
@@ -83,7 +92,7 @@ class RestormerService:
             parameters['out_channels'] = 1
             parameters['LayerNorm_type'] = 'BiasFree'
         else:
-            raise ValueError(f"Not supported task�: {task}")
+            raise ValueError(f"Not supported task {task}")
         
         return weights, parameters
 
@@ -96,7 +105,7 @@ class RestormerService:
         try:
             weights, parameters = self.get_weights_and_parameters(task)
             
-            load_arch = run_path(os.path.join('basicsr', 'models', 'archs', 'restormer_arch.py'))
+            load_arch = run_path(os.path.join('Restormer', 'basicsr', 'models', 'archs', 'restormer_arch.py'))
             model = load_arch['Restormer'](**parameters)
             model.to(self.device)
             
@@ -145,7 +154,6 @@ class RestormerService:
         return encoded_img.tobytes()
 
     def restore_image(self, img_bytes, task, tile=None, tile_overlap=32):
-        model = self.load_model(task)
         
         is_gray = (task == 'Gaussian_Gray_Denoising')
         img = self.load_img_from_bytes(img_bytes, is_gray)
@@ -163,7 +171,7 @@ class RestormerService:
         with torch.no_grad():
             if tile is None:
                 ## Testing on the original resolution image
-                restored = model(input_)
+                restored = self.model(input_)
             else:
                 # test the image tile by tile
                 b, c, h, w = input_.shape
@@ -179,7 +187,7 @@ class RestormerService:
                 for h_idx in h_idx_list:
                     for w_idx in w_idx_list:
                         in_patch = input_[..., h_idx:h_idx + tile, w_idx:w_idx + tile]
-                        out_patch = model(in_patch)
+                        out_patch = self.model(in_patch)
                         out_patch_mask = torch.ones_like(out_patch)
                         
                         E[..., h_idx:(h_idx + tile), w_idx:(w_idx + tile)].add_(out_patch)
@@ -204,7 +212,6 @@ restormer_service = RestormerService()
 
 
 def allowed_file(filename):
-    """检查文件扩展名是否允许"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
@@ -220,16 +227,15 @@ def health_check():
 
 @app.route('/tasks', methods=['GET'])
 def list_tasks():
-    """列出所有支持的任务"""
     return jsonify({
         'tasks': SUPPORTED_TASKS,
         'descriptions': {
-            'Motion_Deblurring': '运动去模糊',
-            'Single_Image_Defocus_Deblurring': '单图像散焦去模糊',
-            'Deraining': '去雨',
-            'Real_Denoising': '真实场景去噪',
-            'Gaussian_Gray_Denoising': '高斯灰度去噪',
-            'Gaussian_Color_Denoising': '高斯彩色去噪'
+            'Motion_Deblurring': '',
+            'Single_Image_Defocus_Deblurring': '',
+            'Deraining': '',
+            'Real_Denoising': '',
+            'Gaussian_Gray_Denoising': '',
+            'Gaussian_Color_Denoising': ''
         }
     }), 200
 
@@ -256,10 +262,8 @@ def restore():
       - restored image (image/png)
     """
     try:
-        task = request.form.get('task') or request.json.get('task') if request.is_json else None
-
-        if not task:
-            return jsonify({'error' : 'lack of task parameters'}), 400
+        task = TASK
+        print("task: ", task)
 
         if task not in SUPPORTED_TASKS:
             return jsonify({
@@ -273,7 +277,7 @@ def restore():
             data = request.get_json()
             image_base64 = data.get('image_base64')
             if not image_base64:
-                return jsonify({'error': 'lack of image_base64 parameters�'}), 400
+                return jsonify({'error': f'Lack of base64 parameters: {str(e)}'}), 400
 
             try:
                 img_bytes = base64.b64decode(image_base64)
@@ -284,18 +288,17 @@ def restore():
             tile_overlap = data.get('tile_overlap', 32)
         else:
             if 'image' not in request.files:
-                return jsonify({'error': 'lack of image file��'}), 400
+                return jsonify({'error': f'Lack of image file: {str(e)}'}), 400
 
             file = request.files['image']
             if file.filename == '':
-                return jsonify({'error': 'no file��'}), 400
+                return jsonify({'error': f'No file: {str(e)}'}), 400
 
             if not allowed_file(file.filename):
                 return jsonify({
                     'error': f'unsupported file type',
                     'allowed_types': list(ALLOWED_EXTENSIONS)
                 }), 400
-
             img_bytes = file.read()
             tile = request.form.get('tile')
             tile_overlap = request.form.get('tile_overlap', 32)
@@ -315,66 +318,11 @@ def restore():
         )
 
     except ValueError as e:
-        logger.error(f"Wrong parameters��: {str(e)}")
+        logger.error(f"Wrong parameter: {str(e)}")
         return jsonify({'error': str(e)}), 400
 
     except Exception as e:
         logger.error(f"Failed image processing: {str(e)}\n{traceback.format_exc()}")
-        return jsonify({
-            'error': 'Failed image restoration',
-            'message': str(e)
-        }), 500
-
-
-@app.route('/restore_base64', methods=['POST'])
-def restore_base64():
-    try:
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'request can not be null'}), 400
-        
-        task = data.get('task')
-        if not task:
-            return jsonify({'error': 'lack of task parameter'}), 400
-        
-        if task not in SUPPORTED_TASKS:
-            return jsonify({
-                'error': f'Unsupported task: {task}',
-                'supported_tasks': SUPPORTED_TASKS
-            }), 400
-        
-        image_base64 = data.get('image_base64')
-        if not image_base64:
-            return jsonify({'error': 'lack of image_base64 parameter'}), 400
-        
-        try:
-            img_bytes = base64.b64decode(image_base64)
-        except Exception as e:
-            return jsonify({'error': f'Failed base64 decoding: {str(e)}'}), 400
-        
-        tile = data.get('tile')
-        tile = int(tile) if tile else None
-        tile_overlap = int(data.get('tile_overlap', 32))
-        
-        logger.info(f"Execute task: {task}, tile: {tile}, tile_overlap: {tile_overlap}")
-        
-        result_bytes = restormer_service.restore_image(img_bytes, task, tile, tile_overlap)
-        
-        result_base64 = base64.b64encode(result_bytes).decode('utf-8')
-        
-        return jsonify({
-            'success': True,
-            'image_base64': result_base64,
-            'task': task
-        }), 200
-        
-    except ValueError as e:
-        logger.error(f"Wrong parameters��: {str(e)}")
-        return jsonify({'error': str(e)}), 400
-        
-    except Exception as e:
-        logger.error(f"Failed processing��: {str(e)}\n{traceback.format_exc()}")
         return jsonify({
             'error': 'Failed image restoration',
             'message': str(e)
@@ -388,13 +336,5 @@ if __name__ == '__main__':
         debug=False,
         threaded=True
     )
-
-
-
-
-
-
-
-
 
 

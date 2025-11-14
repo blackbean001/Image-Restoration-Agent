@@ -7,6 +7,7 @@ import os
 import math
 import io
 import base64
+import yaml
 from werkzeug.utils import secure_filename
 
 import numpy as np
@@ -36,6 +37,8 @@ host = cfg["super_resolution"]["DiffBIR"]["host"]
 opt_config = cfg["super_resolution"]["DiffBIR"]["config"]
 ckpt_path = cfg["super_resolution"]["DiffBIR"]["model_path"]
 
+# app
+app = Flask(__name__)
 
 CONFIG = {
     'model': None,
