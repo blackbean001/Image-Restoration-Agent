@@ -64,7 +64,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n dehazeformer python=3.7  \
   && source activate dehazeformer  \
-  && pip install flask flask_cors ptflops lpips pyyaml  \
+  && pip install flask flask_cors  \
   && pip install -r /app/AgenticIR/executor/dehazing/tools/DehazeFormer/requirements.txt  \
 \
   && conda create -y -n diffbir python=3.10  \
@@ -113,17 +113,17 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n ridcp python=3.8.20  \
   && source activate ridcp  \
-  && pip install flask flask_cors ptflops lpips pyyaml \
+  && pip install flask flask_cors  \
   && pip install -r /app/AgenticIR/executor/dehazing/tools/RIDCP_dehazing/requirements.txt  \
 \
   && conda create -y -n swinir python=3.10.18  \
   && source activate swinir  \
-  && pip install flask flask_cors ptflops lpips pyyaml \
+  && pip install flask flask_cors  \
   && pip install -r /app/AgenticIR/executor/denoising/tools/SwinIR/requirements.txt  \
 \
   && conda create -y -n xrestormer python=3.10.18  \
   && source activate xrestormer  \
-  && pip install flask flask_cors ptflops lpips pyyaml \
+  && pip install flask flask_cors  \
   && pip install -r /app/AgenticIR/executor/denoising/tools/X-Restormer/requirements.txt  \
   && python setup.py develop  \
   && sed -i '8s/.*/from torchvision.transforms.functional import rgb_to_grayscale/' /opt/conda/envs/xrestormer/lib/python3.10/site-packages/basicsr/data/degradations.py

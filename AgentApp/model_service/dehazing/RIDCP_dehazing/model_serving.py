@@ -1,10 +1,6 @@
-import sys
-sys.path.append("RIDCP_dehazing")
-
 from flask import Flask, request, jsonify, send_file
 import cv2
 import os
-import yaml
 import torch
 import numpy as np
 from io import BytesIO
@@ -27,6 +23,7 @@ cfg = load_model_configs()
 port = cfg["dehazing"]["RIDCP"]["port"]
 host = cfg["dehazing"]["RIDCP"]["host"]
 WEIGHT_PATH = cfg["dehazing"]["RIDCP"]["weight_path"]
+ALPHA = float(cfg["dehazing"]["RIDCP"]["alpha"])
 
 MAX_SIZE = 1500
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -47,8 +44,6 @@ def load_model(weight_path, use_weight=False, alpha=1.0):
 
     model.load_state_dict(torch.load(WEIGHT_PATH)['params'], strict=False)
     model.eval()
-    print("Load model success")
-
     return True
 
 
@@ -90,6 +85,24 @@ def health_check():
     })
 
 
+@app.route('/load_model', methods=['POST'])
+def load_model_endpoint():
+    try:
+        data = request.get_json()
+        load_model(WEIGHT_PATH, True, ALPHA)
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Model loaded successfully',
+            'weight_name': weight_name
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+
 @app.route('/dehaze', methods=['POST'])
 def dehaze_image():
     if model is None:
@@ -110,12 +123,9 @@ def dehaze_image():
         return_type = request.form.get('return_type', 'file')  # 'file' or 'base64'
         
         img_bytes = file.read()
-
-        #img = Image.open(io.BytesIO(img_bytes))
-
         nparr = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
-
+        
         if img is None:
             return jsonify({
                 'status': 'error',
@@ -123,7 +133,7 @@ def dehaze_image():
             }), 400
         
         output_img = process_image(img, max_size)
-
+        
         if return_type == 'base64':
             _, buffer = cv2.imencode('.png', output_img)
             img_base64 = base64.b64encode(buffer).decode('utf-8')
@@ -140,7 +150,7 @@ def dehaze_image():
                 as_attachment=True,
                 download_name='dehazed_image.png'
             )
-
+    
     except Exception as e:
         return jsonify({
             'status': 'error',
@@ -196,8 +206,6 @@ def dehaze_base64():
 
 
 if __name__ == '__main__':
-    load_model(WEIGHT_PATH, True)
-
     app.run(host=host,
         port=port,
         debug=False

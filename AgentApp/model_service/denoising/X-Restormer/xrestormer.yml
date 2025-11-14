@@ -7,7 +7,7 @@ padding_size: 64
 
 # dataset and data loader settings
 datasets:
-  test:
+  test_1:
     name: test
     type: SingleImageDataset
     dataroot_lq: ~
@@ -40,11 +40,12 @@ path:
   pretrain_network_g: X-Restormer/experiments/pretrained/denoise_300k.pth
   strict_load_g: true
   resume_state: ~
-  results: results
+  results: ~
 # validation settings
 val:
   save_img: true
   suffix: ~
+
 
 # dist training settings
 dist_params:

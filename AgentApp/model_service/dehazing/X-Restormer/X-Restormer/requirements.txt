@@ -1,5 +1,5 @@
 basicsr
-numpy=1.21.4
+numpy
 opencv-python==4.12.0.88
 requests
 torch==2.2.0
