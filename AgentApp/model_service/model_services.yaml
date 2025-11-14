@@ -126,17 +126,18 @@ super_resolution:
   XRestormer:
     port: 8025
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/super_resolution/X-Restormer/xrestormer.yml"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/super_resolution/X-Restormer/xrestormer.yml"
     model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/X-Restormer/SR/net_g_latest.pth"
   DiffBIR:
     port: 8026
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/super_resolution/DiffBIR/diffbir.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/DiffBIR/v1_general.pth"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/super_resolution/DiffBIR/diffbir.yml"
+    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/DiffBIR/general_full_v1.ckpt"
+    swinir_ckpt_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/DiffBIR/general_swinir_v1.ckpt"
   HAT:
     port: 8027
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_servive/super_resolution/HAT/hat.yml"
+    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/super_resolution/HAT/hat.yml"
     model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/HAT/HAT-L_SRx4_ImageNet-pretrain.pth"
 
 default:

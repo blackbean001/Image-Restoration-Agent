@@ -36,6 +36,8 @@ port = cfg["super_resolution"]["DiffBIR"]["port"]
 host = cfg["super_resolution"]["DiffBIR"]["host"]
 opt_config = cfg["super_resolution"]["DiffBIR"]["config"]
 ckpt_path = cfg["super_resolution"]["DiffBIR"]["model_path"]
+swinir_ckpt_path = cfg["super_resolution"]["DiffBIR"]["swinir_ckpt_path"]
+
 
 # app
 app = Flask(__name__)
@@ -98,7 +100,7 @@ def process(
     height, width = control.size(-2), control.size(-1)
     shape = (n_samples, 4, height // 8, width // 8)
     x_T = torch.randn(shape, device=model.device, dtype=torch.float32)
-    
+
     if not tiled:
         samples = sampler.sample(
             steps=steps, shape=shape, cond_img=control,

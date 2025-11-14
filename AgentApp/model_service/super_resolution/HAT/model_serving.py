@@ -47,7 +47,6 @@ app.config['UPLOAD_FOLDER'] = tempfile.mkdtemp()
 model_cache = {}
 model_lock = Lock()
 
-
 # Allowed extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'tiff'}
 
@@ -91,7 +90,7 @@ def custom_parse_options_from_config(config_path, root_path, is_train=False):
     for key, val in opt['path'].items():
         if (val is not None) and ('resume_state' in key or 'pretrain_network' in key):
             opt['path'][key] = osp.expanduser(val)
-
+    
     if not is_train:
         results_root = osp.join(opt['path'].get('results', root_path), opt['name'])
         opt['path']['results_root'] = results_root
@@ -107,17 +106,21 @@ def load_model(config_path, root_path):
         if config_path not in model_cache:
             opt = custom_parse_options_from_config(config_path, root_path, is_train=False)
             torch.backends.cudnn.benchmark = True
-            
+
             # Create directories
             make_exp_dirs(opt)
-            
+
             # Build model
             model = build_model(opt)
             model_cache[config_path] = {'model': model, 'opt': opt}
-            
+
         return model_cache[config_path]['model'], model_cache[config_path]['opt']
 
+# load_model globally
+MODEL, OPT = load_model(opt_config, "./")
 
+
+@app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
     return jsonify({
@@ -139,19 +142,17 @@ def test_image():
     try:
         # Get config path
 
-        root_path = request.form.get('root_path', osp.abspath(osp.join(__file__, osp.pardir)))
+        #root_path = request.form.get('root_path', osp.abspath(osp.join(__file__, osp.pardir)))
+        root_path = "./"
         save_img = request.form.get('save_img', 'true').lower() == 'true'
 
-        # Load model
-        model, opt = load_model(opt_config, root_path)
-
         # Update save_img option
-        if 'val' in opt:
-            opt['val']['save_img'] = save_img
-
+        if 'val' in OPT:
+            OPT['val']['save_img'] = save_img
+        
         # Create test dataset and dataloader
         test_loaders = []
-        for _, dataset_opt in sorted(opt['datasets'].items()):
+        for _, dataset_opt in sorted(OPT['datasets'].items()):
             # If image file is provided, update dataroot_lq
             if 'image' in request.files:
                 file = request.files['image']
@@ -164,95 +165,31 @@ def test_image():
 
             test_set = build_dataset(dataset_opt)
             test_loader = build_dataloader(
-                test_set, dataset_opt, num_gpu=opt['num_gpu'],
-                dist=opt['dist'], sampler=None, seed=opt['manual_seed'])
+                test_set, dataset_opt, num_gpu=OPT['num_gpu'],
+                dist=OPT['dist'], sampler=None, seed=OPT['manual_seed'])
             test_loaders.append(test_loader)
-
+        
         # Run validation
         results = []
         for test_loader in test_loaders:
             test_set_name = test_loader.dataset.opt['name']
-            model.validation(test_loader, current_iter=opt['name'],
+            MODEL.validation(test_loader, current_iter=OPT['name'],
                            tb_logger=None, save_img=save_img)
             results.append({
                 'dataset': test_set_name,
                 'num_images': len(test_loader.dataset),
-                'output_path': opt['path']['visualization'] if save_img else None
+                'output_path': OPT['path']['visualization'] if save_img else None
             })
-
+        
         return jsonify({
             'status': 'success',
             'results': results,
-            'config': config_path
         })
 
     except Exception as e:
         logging.error(f"Error during testing: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-
-@app.route('/test_pipeline', methods=['POST'])
-def test_pipeline_endpoint():
-    """
-    Full test pipeline endpoint
-    Expected JSON body:
-    {
-        "config_path": "path/to/config.yml",
-        "root_path": "optional/root/path"
-    }
-    """
-    try:
-        data = request.get_json()
-        
-        root_path = data.get('root_path', osp.abspath(osp.join(__file__, osp.pardir, osp.pardir)))
-
-        # Parse options
-        opt = custom_parse_options_from_config(opt_config, root_path, is_train=False)
-        
-        torch.backends.cudnn.benchmark = True
-
-        # Create directories and logger
-        make_exp_dirs(opt)
-        log_file = osp.join(opt['path']['log'], f"test_{opt['name']}_{get_time_str()}.log")
-        logger = get_root_logger(logger_name='basicsr', log_level=logging.INFO, log_file=log_file)
-        logger.info(get_env_info())
-        logger.info(dict2str(opt))
-
-        # Create test dataset and dataloader
-        test_loaders = []
-        for _, dataset_opt in sorted(opt['datasets'].items()):
-            test_set = build_dataset(dataset_opt)
-            test_loader = build_dataloader(
-                test_set, dataset_opt, num_gpu=opt['num_gpu'], 
-                dist=opt['dist'], sampler=None, seed=opt['manual_seed'])
-            logger.info(f"Number of test images in {dataset_opt['name']}: {len(test_set)}")
-            test_loaders.append(test_loader)
-
-        # Create model
-        model = build_model(opt)
-
-        # Run validation
-        results = []
-        for test_loader in test_loaders:
-            test_set_name = test_loader.dataset.opt['name']
-            logger.info(f'Testing {test_set_name}...')
-            model.validation(test_loader, current_iter=opt['name'], 
-                           tb_logger=None, save_img=opt['val']['save_img'])
-            results.append({
-                'dataset': test_set_name,
-                'num_images': len(test_loader.dataset)
-            })
-
-        return jsonify({
-            'status': 'success',
-            'results': results,
-            'log_file': log_file,
-            'output_path': opt['path']['visualization']
-        })
-
-    except Exception as e:
-        logging.error(f"Error in test pipeline: {str(e)}")
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/clear_cache', methods=['POST'])
 def clear_cache():
