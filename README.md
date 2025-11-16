@@ -1,6 +1,9 @@
 **Intro**    
 1. This repo contains a restoration agent system for images with mixed degradation.
-2. The repo is inspired by AgenticIR (https://github.com/Kaiwen-Zhu/AgenticIR). We try to accelerate the restoration process by using CLIP4CIR (https://github.com/ABaldrati/CLIP4Cir/tree/master) to find similar images in the database. 
+2. The repo is inspired by AgenticIR (https://github.com/Kaiwen-Zhu/AgenticIR) with following changes:
+   (1) We rebuilt the end-to-end pipeline with LangGraph for better state management and efficiency.
+   (2) We replaced offline model inference with service-based inference to prepare for production-level deployment (in progress). 
+   (3) We try to accelerate the restoration process by using CLIP4CIR (https://github.com/ABaldrati/CLIP4Cir/tree/master) to find similar images in the database.
 
 **AgenticIR**:   
 1. Run "docker build ." to create environment. One can use "conda env list" to check env for different models.
