@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgenticIR")
+sys.path.append("../../AgenticIR")
 
 import os
 from pathlib import Path

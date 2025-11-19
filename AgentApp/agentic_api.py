@@ -82,11 +82,11 @@ async def image_restoration_endpoint(
         # input args
         invoke_dict = {}
 
-        AgenticIR_dir = Path("/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgenticIR")
-        CLIP4CIR_model_dir = Path("/home/jason/CLIP4Cir/models")
+        AgenticIR_dir = Path("../AgenticIR")
+        CLIP4CIR_model_dir = Path("../AgenticIR/retrival_database/CLIP4Cir/models")
 
         # set input_img_path
-        invoke_dict["input_img_path"] = "/home/jason/Auto-Image-Restoration-Service/Auto-Image-Restoration/AgentApp/demo_input/001.png"
+        invoke_dict["input_img_path"] = "./demo_input/001.png"
         invoke_dict["image"] = input_image
         invoke_dict["depictqa"] = get_depictqa()
         invoke_dict["gpt4"] = get_GPT4(AgenticIR_dir / "config.yml")
@@ -96,9 +96,9 @@ async def image_restoration_endpoint(
 
         invoke_dict["retrieval_args"] = {}
         invoke_dict["retrieval_args"]["combining_function"] = "combiner"
-        invoke_dict["retrieval_args"]["combiner_path"] = CLIP4CIR_model_dir / "combiner_trained_on_imgres_RN50x4_2025-09-05_12:30:03/saved_models/combiner_arithmetic.pt"
+        invoke_dict["retrieval_args"]["combiner_path"] = CLIP4CIR_model_dir / "combiner_trained_on_imgres_RN50x4/saved_models/combiner_arithmetic.pt"
         invoke_dict["retrieval_args"]["clip_model_name"] = "RN50x4"
-        invoke_dict["retrieval_args"]["clip_model_path"] = CLIP4CIR_model_dir / "clip_finetuned_on_imgres_RN50x4_2025-09-05_10:48:31/saved_models/tuned_clip_arithmetic.pt"
+        invoke_dict["retrieval_args"]["clip_model_path"] = CLIP4CIR_model_dir / "clip_finetuned_on_imgres_RN50x4/saved_models/tuned_clip_arithmetic.pt"
         invoke_dict["retrieval_args"]["projection_dim"] = 2560
         invoke_dict["retrieval_args"]["hidden_dim"] = 5120
         invoke_dict["retrieval_args"]["transform"] = "targetpad"

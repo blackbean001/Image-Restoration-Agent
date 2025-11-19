@@ -13,7 +13,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # build postgresql environment
 RUN apt-get update  \
-  && apt-get install -y git vim unzip \
+  && apt-get install -y git vim unzip curl  \
   && apt-get install -y postgresql postgresql-client  \
   && apt-get install git-lfs && git-lfs install  \
   && /etc/init.d/postgresql start  \
@@ -37,6 +37,7 @@ RUN pip install gdown==5.2.0  \
   && cd /app/AgentApp/weights/jpeg_compression_artifact_removal/FBCNN && sh download_ckpt.sh \
   && cd /app/AgentApp/weights/super_resolution/DiffBIR && sh download_ckpt.sh \
   && cd /app/AgentApp/weights/super_resolution/HAT && python download_ckpts.py \
+  && cd /app/AgenticIR/retrival_database/CLIP4CIR/models && python download_ckpts.py \
 \
   && cd /app/Auto-Image-Restoration/AgenticIR/DepictQA/weights && sh download_ViT-L-14.sh \
   && sh download_vicuna-7b-v1.5.sh && cd delta && sh download_Abstractor.sh && sh download_degra_eval.sh
@@ -56,11 +57,10 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n agenticir python=3.10  \
   && source activate agenticir  \
-  && apt-get install -y ffmpeg libsm6 libxext6  \
+  && apt-get install -y ffmpeg libsm6 libxext6 curl  \
   && cd /app/AgenticIR && pip install -r installation/requirements.txt  \
   && pip install git+https://github.com/openai/CLIP.git \
-  && pip install langgraph \
-  && sh installation/deploy_tools.sh \
+  && pip install langgraph fastapi python-multipart uvicorn \
 \
   && conda create -y -n depictqa python=3.10  \
   && source activate depictqa  \
