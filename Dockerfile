@@ -13,7 +13,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # build postgresql environment
 RUN apt-get update  \
-  && apt-get install -y git vim  \
+  && apt-get install -y git vim unzip \
   && apt-get install -y postgresql postgresql-client  \
   && apt-get install git-lfs && git-lfs install  \
   && /etc/init.d/postgresql start  \
