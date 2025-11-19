@@ -1,0 +1,65 @@
+Setting ds_accelerator to cuda (auto detect)
+weights/vicuna-7b-v1.5/
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:06<00:06,  6.04s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:08<00:00,  4.02s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:08<00:00,  4.33s/it]
+/opt/conda/envs/depictqa/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:381: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`. This was detected when initializing the generation config instance, which means the corresponding file may hold incorrect parameterization and should be fixed.
+  warnings.warn(
+/opt/conda/envs/depictqa/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:386: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`. This was detected when initializing the generation config instance, which means the corresponding file may hold incorrect parameterization and should be fixed.
+  warnings.warn(
+trainable params: 16777216 || all params: 6755192832 || trainable%: 0.24836028248556738
+root
+├── vision_encoder (VisionTransformer) class_embedding:[1024] 
+│   positional_embedding:[257, 1024] proj:[1024, 768]
+│   ├── conv1 (Conv2d) weight:[1024, 3, 14, 14]
+│   ├── ln_pre,ln_post(LayerNorm) weight:[1024] bias:[1024]
+│   └── transformer (Transformer)
+│       └── resblocks (Sequential)
+│           └── 0-23(ResidualAttentionBlock)
+│               ├── attn (MultiheadAttention) in_proj_weight:[3072, 1024] 
+│               │   in_proj_bias:[3072]
+│               │   └── out_proj (NonDynamicallyQuantizableLinear) weight:[1024,
+│               │       1024] bias:[1024]
+│               ├── ln_1,ln_2(LayerNorm) weight:[1024] bias:[1024]
+│               └── mlp (Sequential)
+│                   ├── c_fc (Linear) weight:[4096, 1024] bias:[4096]
+│                   └── c_proj (Linear) weight:[1024, 4096] bias:[1024]
+├── llm (PeftModelForCausalLM)
+│   └── base_model (LoraModel)
+│       └── model (LlamaForCausalLM)
+│           ├── model (LlamaModel)
+│           │   ├── embed_tokens (Embedding) weight:[32000, 4096]
+│           │   ├── layers (ModuleList)
+│           │   │   └── 0-31(LlamaDecoderLayer)
+│           │   │       ├── self_attn (LlamaAttention)
+│           │   │       │   └── q_proj,k_proj,v_proj,o_proj(Linear) 
+│           │   │       │       weight:[4096, 4096]
+│           │   │       │       ├── lora_dropout (ModuleDict)
+│           │   │       │       ├── lora_A (ModuleDict)
+│           │   │       │       │   └── default (Linear) weight:[16, 4096]
+│           │   │       │       └── lora_B (ModuleDict)
+│           │   │       │           └── default (Linear) weight:[4096, 16]
+│           │   │       ├── mlp (LlamaMLP)
+│           │   │       │   ├── gate_proj,up_proj(Linear) weight:[11008, 4096]
+│           │   │       │   └── down_proj (Linear) weight:[4096, 11008]
+│           │   │       └── input_layernorm,post_attention_layernorm(LlamaRMSNor
+│           │   │           m) weight:[4096]
+│           │   └── norm (LlamaRMSNorm) weight:[4096]
+│           └── lm_head (Linear) weight:[32000, 4096]
+├── abstractor (AbstractorModel) query_embeds:[64, 1, 1024]
+│   └── abstractor (TransformerDecoder)
+│       └── layers (ModuleList)
+│           └── 0-3(TransformerDecoderLayer)
+│               ├── self_attn,multihead_attn(MultiheadAttention) 
+│               │   in_proj_weight:[3072, 1024] in_proj_bias:[3072]
+│               │   └── out_proj (NonDynamicallyQuantizableLinear) weight:[1024,
+│               │       1024] bias:[1024]
+│               ├── linear1 (Linear) weight:[2048, 1024] bias:[2048]
+│               ├── linear2 (Linear) weight:[1024, 2048] bias:[1024]
+│               └── norm1,norm2,norm3(LayerNorm) weight:[1024] bias:[1024]
+└── vision_proj (Linear) weight:[4096, 1024] bias:[4096]
+ * Serving Flask app 'app_eval'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:6006
+ * Running on http://172.17.0.2:6006
+INFO:werkzeug:[33mPress CTRL+C to quit[0m

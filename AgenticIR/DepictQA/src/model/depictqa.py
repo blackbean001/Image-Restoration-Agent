@@ -63,6 +63,7 @@ class DepictQA(nn.Module):
 
         llm_path = args.model["llm_path"]
         logging.info(f"Initializing LLM from {llm_path} ...")
+        print(llm_path)
         self.llm = LlamaForCausalLM.from_pretrained(llm_path)
         self.llm = get_peft_model(self.llm, peft_config)
         self.llm.print_trainable_parameters()

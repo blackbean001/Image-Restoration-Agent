@@ -15,6 +15,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update  \
   && apt-get install -y git vim  \
   && apt-get install -y postgresql postgresql-client  \
+  && apt-get install git-lfs && git-lfs install  \
   && /etc/init.d/postgresql start  \
   && pip install pgvector  && apt install -y postgresql-server-dev-14  \
   && git clone --branch v0.8.1 https://github.com/pgvector/pgvector.git && cd pgvector && make && make install && cd .. \
@@ -35,7 +36,10 @@ RUN pip install gdown==5.2.0  \
   && cd /app/AgentApp/weights/denoising/SwinIR && python download_ckpts.py \
   && cd /app/AgentApp/weights/jpeg_compression_artifact_removal/FBCNN && sh download_ckpt.sh \
   && cd /app/AgentApp/weights/super_resolution/DiffBIR && sh download_ckpt.sh \
-  && cd /app/AgentApp/weights/super_resolution/HAT && python download_ckpts.py
+  && cd /app/AgentApp/weights/super_resolution/HAT && python download_ckpts.py \
+\
+  && cd /app/Auto-Image-Restoration/AgenticIR/DepictQA/weights && sh download_ViT-L-14.sh \
+  && sh download_vicuna-7b-v1.5.sh && cd delta && sh download_Abstractor.sh && sh download_degra_eval.sh
 
 # build environment
 RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
@@ -45,8 +49,8 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && source activate clip4cir  \
   && conda install -y -c pytorch pytorch=1.11.0 torchvision=0.12.0  \
   && conda install -y -c anaconda pandas=1.4.2 \
-  && pip install -y comet-ml==3.21.0, urllib3==1.26.18  \
-  && pip install -y git+https://github.com/openai/CLIP.git  \
+  && pip install comet-ml==3.21.0, urllib3==1.26.18  \
+  && pip install git+https://github.com/openai/CLIP.git  \
   && pip install pgvector  \
   && apt-get install -y libpq-dev && pip install psycopg2  \
 \
@@ -54,15 +58,17 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && source activate agenticir  \
   && apt-get install -y ffmpeg libsm6 libxext6  \
   && cd /app/AgenticIR && pip install -r installation/requirements.txt  \
-  && pip install -y git+https://github.com/openai/CLIP.git \
+  && pip install git+https://github.com/openai/CLIP.git \
   && pip install langgraph \
+  && sh installation/deploy_tools.sh \
 \
   && conda create -y -n depictqa python=3.10  \
   && source activate depictqa  \
   && pip install -r /app/AgenticIR/DepictQA/requirements.txt  \
+  && pip install flask huggingface-hub==0.23.0  \
   && cd /app/AgenticIR/DepictQA && sh launch_service.sh  \
 \
-  && conda create -y -n dehazeformer python=3.7  \
+  && conda create -y -n dehazeformer python=3.10  \
   && source activate dehazeformer  \
   && pip install flask flask_cors ptflops lpips pyyaml  \
   && pip install -r /app/AgenticIR/executor/dehazing/tools/DehazeFormer/requirements.txt  \
@@ -81,7 +87,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && conda create -y -n fbcnn python=3.10.18  \
   && source activate fbcnn  \
   && pip install flask flask_cors ptflops lpips pyyaml \
-  && pip install -r /app/AgenticIR/executor/jpeg_compression_artifact_removal/tools/FBCNN/requirements.txt  \
+  && pip install -r  /app/AgenticIR/executor/jpeg_compression_artifact_removal/tools/FBCNN/requirements.txt \
 \
   && conda create -y -n hat python=3.10.18  \
   && source activate hat  \
@@ -104,7 +110,9 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && conda create -y -n mprnet python=3.7.16  \
   && source activate mprnet  \
   && pip install flask flask_cors ptflops lpips pyyaml \
-  && pip install -r /app/AgenticIR/executor/denoising/tools/MPRNet/requirements.txt  \
+  && conda install -y pytorch=1.1 torchvision=0.3 cudatoolkit=9.0 -c pytorch  \
+  && pip install matplotlib scikit-image opencv-python yacs joblib natsort h5py tqdm  \
+  && cd /app/Auto-Image-Restoration/AgenticIR/executor/denoising/tools/MPRNet/pytorch-gradual-warmup-lr && python setup.py install  \
 \
   && conda create -y -n restormer python=3.7.16  \
   && source activate restormer  \
