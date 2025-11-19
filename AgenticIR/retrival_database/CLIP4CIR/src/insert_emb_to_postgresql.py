@@ -307,16 +307,19 @@ def insert_to_postgresql(conn, clip_model, \
     img_path_list = []
     res_seqs = []
     for img_file in os.listdir(imgres_dir):
-        summary_path = imgres_dir / img_file / "logs" / "summary.json"
-        if not os.path.exist(summary_path):
-            print(f"WARNING: THE IMAGE FILES IN {summary_path} IS NOT COMPLETE, PLEASE CHECK !!!")
-        with open(summary_path, 'r') as f:
-            summary = json.load(f)
-        subtasks = summary["execution_path"]["subtasks"]
-        tools = summary["execution_path"]["tools"]
-        res_seqs.append("/".join([subtasks[i]+"_"+tools[i] for i in range(len(tools))]))
-        img_path_list.append(summary["tree"]["img_path"])
-
+        try:
+            summary_path = imgres_dir / img_file / "logs" / "summary.json"
+            if not os.path.exists(summary_path):
+                print(f"WARNING: THE IMAGE FILES IN {summary_path} IS NOT COMPLETE, PLEASE CHECK !!!")
+            with open(summary_path, 'r') as f:
+                summary = json.load(f)
+            subtasks = summary["execution_path"]["subtasks"]
+            tools = summary["execution_path"]["tools"]
+            res_seqs.append("/".join([subtasks[i]+"_"+tools[i] for i in range(len(tools))]))
+            img_path_list.append(summary["tree"]["img_path"])
+        except:
+            print(f"Skip {img_file}")
+            continue
     classic_test_dataset = ImgResDataset(preprocess, img_path_list, 'classic', 'val')
     index_features, index_names = extract_index_features(classic_test_dataset, clip_model)
     print("Number of images to insert:", len(img_path_list), len(index_names))

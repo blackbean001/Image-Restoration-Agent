@@ -19,8 +19,9 @@ RUN apt-get update  \
   && pip install pgvector  && apt install -y postgresql-server-dev-14  \
   && git clone --branch v0.8.1 https://github.com/pgvector/pgvector.git && cd pgvector && make && make install && cd .. \
   && apt-get install -y libpq-dev && pip install psycopg2  \
-  && sed -i '90s/.*/local   all             postgres                                peer/' /etc/postgresql/14/main/pg_hba.conf \
+  && sed -i "$(($(wc -l < /etc/postgresql/14/main/pg_hba.conf)-20+1)),\$ s/\bpeer\b/trust/" /etc/postgresql/14/main/pg_hba.conf  \
   && /etc/init.d/postgresql start \
+  && psql -U postgres -c "CREATE DATABASE agenticir_rag_test;" \ 
   && apt-get install -y systemd
 
 # download model weights

@@ -3,4 +3,4 @@ sh clip_finetuning.sh
 sh combiner_finetuning.sh
 sh test.sh
 
-insert_emb_postgresql.sh
+sh insert_emb_postgresql.sh
