@@ -245,11 +245,12 @@ def initialize_service(config):
 
 if __name__ == "__main__":
     cfg = load_model_configs()
+    root_dir = cfg["root_dir"]
 
     port = cfg["defocus_deblurring"]["IFAN"]["port"]
     host = cfg["defocus_deblurring"]["IFAN"]["host"]
     ckpt_name = cfg["defocus_deblurring"]["IFAN"]["ckpt_name"]
-    ckpt_abs = cfg["defocus_deblurring"]["IFAN"]["ckpt_abs"]
+    ckpt_abs = os.path.join(root_dir, cfg["defocus_deblurring"]["IFAN"]["ckpt_abs"])
     config_name = cfg["defocus_deblurring"]["IFAN"]["config"]
     mode = cfg["defocus_deblurring"]["IFAN"]["mode"]
     network = cfg["defocus_deblurring"]["IFAN"]["network"]

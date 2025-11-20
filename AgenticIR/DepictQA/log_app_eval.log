@@ -102,3 +102,189 @@ INFO:werkzeug:127.0.0.1 - - [19/Nov/2025 14:43:39] "POST /evaluate_degradation H
 INFO:werkzeug:127.0.0.1 - - [19/Nov/2025 14:43:39] "POST /evaluate_degradation HTTP/1.1" 200 -
 INFO:werkzeug:127.0.0.1 - - [19/Nov/2025 14:43:39] "POST /evaluate_degradation HTTP/1.1" 200 -
 INFO:werkzeug:127.0.0.1 - - [19/Nov/2025 14:43:40] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:19:16] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:19:16] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:19:17] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:19:17] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:19:18] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:19:18] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:19:19] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:21:15] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:21:16] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:21:16] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:21:16] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:21:17] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:21:17] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:21:18] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:24:51] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:24:51] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:24:52] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:24:52] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:24:52] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:24:53] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:24:53] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:29:30] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:29:31] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:29:31] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:29:32] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:29:32] "POST /evaluate_degradation HTTP/1.1" 200 -
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/001.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 180, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 178, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 179, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 177, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  torch.Size([1, 176, 4096])
+img_path:  ['/home/jason/Auto-Image-Restoration/AgentApp/demo_input/input.png'] [None]
+input_embs.shape:  INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:29:33] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:29:33] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:33:09] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:33:09] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:33:10] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:33:10] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:33:11] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:33:11] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:33:11] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:36:20] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:36:20] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:36:21] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:36:21] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:36:22] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:36:22] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:36:23] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:38:06] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:38:07] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:38:07] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:38:08] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:38:08] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:38:09] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:38:09] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:50:39] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:50:39] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:50:40] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:50:40] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:50:41] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:50:41] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 10:50:42] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 11:02:36] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 11:02:37] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 11:02:37] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 11:02:37] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 11:02:38] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 11:02:38] "POST /evaluate_degradation HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Nov/2025 11:02:39] "POST /evaluate_degradation HTTP/1.1" 200 -

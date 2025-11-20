@@ -36,10 +36,12 @@ def load_model_configs(config_path="../../model_services.yaml"):
     return config
 
 cfg = load_model_configs()
+
+root_dir = cfg["root_dir"]
 port = cfg["denoising"]["XRestormer"]["port"]
 host = cfg["denoising"]["XRestormer"]["host"]
-opt_config = cfg["denoising"]["XRestormer"]["config"]
-model_path = cfg["denoising"]["XRestormer"]["model_path"]
+opt_config = os.path.join(root_dir, cfg["denoising"]["XRestormer"]["config"])
+model_path = os.path.join(root_dir, cfg["denoising"]["XRestormer"]["model_path"])
 
 
 # global configuration

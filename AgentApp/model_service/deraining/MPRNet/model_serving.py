@@ -28,9 +28,10 @@ def load_model_configs(config_path="../../model_services.yaml"):
 
 cfg = load_model_configs()
 
+root_dir = cfg["root_dir"]
 port = cfg["deraining"]["MPRNet"]["port"]
 host = cfg["deraining"]["MPRNet"]["host"]
-weight_dir = cfg["deraining"]["MPRNet"]["weight_dir"]
+weight_dir = os.path.join(root_dir, cfg["deraining"]["MPRNet"]["weight_dir"])
 
 # app
 app = Flask(__name__)

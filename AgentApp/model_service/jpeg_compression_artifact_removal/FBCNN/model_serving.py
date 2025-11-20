@@ -34,9 +34,10 @@ def load_model_configs(config_path="../../model_services.yaml"):
 
 cfg = load_model_configs()
 
+root_dir = cfg["root_dir"]
 port = cfg["jpeg_compression_artifact_removal"]["FBCNN"]["port"]
 host = cfg["jpeg_compression_artifact_removal"]["FBCNN"]["host"]
-weight_dir = cfg["jpeg_compression_artifact_removal"]["FBCNN"]["weight_dir"]
+weight_dir = os.path.join(root_dir, cfg["jpeg_compression_artifact_removal"]["FBCNN"]["weight_dir"])
 
 # global params
 model = None

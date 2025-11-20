@@ -22,9 +22,10 @@ def load_model_configs(config_path="../../model_services.yaml"):
 
 cfg = load_model_configs()
 
+root_dir = cfg["root_dir"]
 port = cfg["denoising"]["SwinIR"]["port"]
 host = cfg["denoising"]["SwinIR"]["host"]
-model_path = cfg["denoising"]["SwinIR"]["model_path"]
+model_path = os.path.join(root_dir, cfg["denoising"]["SwinIR"]["model_path"])
 
 
 # app

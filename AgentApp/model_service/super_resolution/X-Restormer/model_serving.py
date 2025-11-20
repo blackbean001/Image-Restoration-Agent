@@ -36,10 +36,12 @@ def load_model_configs(config_path="../../model_services.yaml"):
     return config
 
 cfg = load_model_configs()
+
+root_dir = cfg["root_dir"]
 port = cfg["super_resolution"]["XRestormer"]["port"]
 host = cfg["super_resolution"]["XRestormer"]["host"]
-opt_config = cfg["super_resolution"]["XRestormer"]["config"]
-model_path = cfg["super_resolution"]["XRestormer"]["model_path"]
+opt_config = os.path.join(root_dir, cfg["super_resolution"]["XRestormer"]["config"])
+model_path = os.path.join(root_dir, cfg["super_resolution"]["XRestormer"]["model_path"])
 
 
 # global configuration

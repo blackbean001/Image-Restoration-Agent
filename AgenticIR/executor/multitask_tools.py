@@ -240,6 +240,7 @@ class MAXIM(Tool):
         shutil.copy(cur_input_path, rqd_input_path)
 
     def _get_cmd_opts(self) -> list[str]:
+        print("PATH: ", os.path.dirname(os.path.abspath(__file__)))
         """Requires parameter `input_dir: Path`, `output_dir: Path`, `opt_task: str`, and `opt_ckpt_name: str`."""
         return [
             "--task", self.opt_task,

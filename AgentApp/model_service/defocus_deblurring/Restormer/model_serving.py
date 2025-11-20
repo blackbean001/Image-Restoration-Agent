@@ -47,9 +47,10 @@ def load_model_configs(config_path="../../model_services.yaml"):
 
 cfg = load_model_configs()
 
+root_dir = cfg["root_dir"]
 port = cfg["defocus_deblurring"]["Restormer"]["port"]
 host = cfg["defocus_deblurring"]["Restormer"]["host"]
-weight_dir = cfg["defocus_deblurring"]["Restormer"]["weight_dir"]
+weight_dir = os.path.join(root_dir, cfg["defocus_deblurring"]["Restormer"]["weight_dir"])
 
 class RestormerService:
     def __init__(self):

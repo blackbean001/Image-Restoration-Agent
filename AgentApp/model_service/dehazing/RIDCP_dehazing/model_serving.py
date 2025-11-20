@@ -24,9 +24,10 @@ def load_model_configs(config_path="../../model_services.yaml"):
 
 cfg = load_model_configs()
 
+root_dir = cfg["root_dir"]
 port = cfg["dehazing"]["RIDCP"]["port"]
 host = cfg["dehazing"]["RIDCP"]["host"]
-WEIGHT_PATH = cfg["dehazing"]["RIDCP"]["weight_path"]
+WEIGHT_PATH = os.path.join(root_dir, cfg["dehazing"]["RIDCP"]["weight_path"])
 
 MAX_SIZE = 1500
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

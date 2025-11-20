@@ -31,10 +31,12 @@ def load_model_configs(config_path="../../model_services.yaml"):
     return config
 
 cfg = load_model_configs()
+
+root_dir = cfg["root_dir"]
 port = cfg["super_resolution"]["HAT"]["port"]
 host = cfg["super_resolution"]["HAT"]["host"]
-opt_config = cfg["super_resolution"]["HAT"]["config"]
-ckpt_path = cfg["super_resolution"]["HAT"]["model_path"]
+opt_config = os.path.join(root_dir, cfg["super_resolution"]["HAT"]["config"])
+ckpt_path = os.path.join(root_dir, cfg["super_resolution"]["HAT"]["model_path"])
 
 
 # app

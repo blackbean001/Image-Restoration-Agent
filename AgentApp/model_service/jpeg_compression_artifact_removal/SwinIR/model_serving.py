@@ -22,9 +22,10 @@ def load_model_configs(config_path="../../model_services.yaml"):
 
 cfg = load_model_configs()
 
+root_dir = cfg["root_dir"]
 port = cfg["jpeg_compression_artifact_removal"]["SwinIR"]["port"]
 host = cfg["jpeg_compression_artifact_removal"]["SwinIR"]["host"]
-model_path = cfg["jpeg_compression_artifact_removal"]["SwinIR"]["model_path"]
+model_path = os.path.join(root_dir, cfg["jpeg_compression_artifact_removal"]["SwinIR"]["model_path"])
 
 
 # app

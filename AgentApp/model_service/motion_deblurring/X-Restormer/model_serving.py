@@ -37,10 +37,11 @@ def load_model_configs(config_path="../../model_services.yaml"):
 
 cfg = load_model_configs()
 
+root_dir = cfg["root_dir"]
 port = cfg["motion_deblurring"]["XRestormer"]["port"]
 host = cfg["motion_deblurring"]["XRestormer"]["host"]
-opt_config = cfg["motion_deblurring"]["XRestormer"]["config"]
-model_path = cfg["motion_deblurring"]["XRestormer"]["model_path"]
+opt_config = os.path.join(root_dir, cfg["motion_deblurring"]["XRestormer"]["config"])
+model_path = os.path.join(root_dir, cfg["motion_deblurring"]["XRestormer"]["model_path"])
 
 
 # global configuration

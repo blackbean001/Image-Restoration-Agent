@@ -32,10 +32,12 @@ def load_model_configs(config_path="../../model_services.yaml"):
     return config
 
 cfg = load_model_configs()
+
+root_dir = cfg["root_dir"]
 port = cfg["defocus_deblurring"]["DRBNet"]["port"]
 host = cfg["defocus_deblurring"]["DRBNet"]["host"]
-single_ckpt = cfg["defocus_deblurring"]["DRBNet"]["model_path"]["single"]
-dual_ckpt = cfg["defocus_deblurring"]["DRBNet"]["model_path"]["dual"]
+single_ckpt = os.path.join(root_dir, cfg["defocus_deblurring"]["DRBNet"]["model_path"]["single"])
+dual_ckpt = os.path.join(root_dir, cfg["defocus_deblurring"]["DRBNet"]["model_path"]["dual"])
 
 # app
 app = Flask(__name__)

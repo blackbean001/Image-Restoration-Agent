@@ -1,3 +1,5 @@
+root_dir: "/home/jason/Auto-Image-Restoration"
+
 brightening:
   port: 8001
   host: "0.0.0.0"
@@ -10,8 +12,8 @@ defocus_deblurring:
     port: 8002
     host: "0.0.0.0"
     model_path:
-      dual: "/home/jason/Auto-Image-Restoration/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/dual_images_defocus_deblurring.pth"
-      single: "/home/jason/Auto-Image-Restoration/AgentApp/weights/defocus_deblurring/DRBNet/ckpts/single/single_image_defocus_deblurring.pth"  
+      dual: "AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/dual_images_defocus_deblurring.pth"
+      single: "AgentApp/weights/defocus_deblurring/DRBNet/ckpts/single/single_image_defocus_deblurring.pth"  
   IFAN:
     port: 8003
     host: "0.0.0.0"
@@ -20,128 +22,142 @@ defocus_deblurring:
     mode: "IFAN"
     project: "ImgRes_AgentApp"
     ckpt_name: "IFAN.pytorch"
-    ckpt_abs: "/home/jason/Auto-Image-Restoration/AgentApp/weights/defocus_deblurring/IFAN/IFAN.pytorch"  
+    ckpt_abs: "AgentApp/weights/defocus_deblurring/IFAN/IFAN.pytorch"  
   Restormer:
     port: 8004
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/defocus_deblurring/Restormer/Defocus_Deblurring"
+    weight_dir: "AgentApp/weights/defocus_deblurring/Restormer/Defocus_Deblurring"
 
 dehazing:
   Dehazeformer:
     port: 8005
     host: "0.0.0.0"
     model_name: "dehazeformer-b"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/dehazing/DehazeFormer/saved_models/indoor/dehazeformer-b.pth"
+    model_path: "AgentApp/weights/dehazing/DehazeFormer/saved_models/indoor/dehazeformer-b.pth"
   RIDCP:
     port: 8006
     host: "0.0.0.0"
-    weight_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/dehazing/RIDCP_dehazing/pretrained_RIDCP.pth"
+    weight_path: "AgentApp/weights/dehazing/RIDCP_dehazing/pretrained_RIDCP.pth"
     alpha: "-21.25"
   XRestormer:
     port: 8007
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/dehazing/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth"
+    config: "AgentApp/model_service/dehazing/X-Restormer/xrestormer.yml"
+    model_path: "AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth"
   MAXIM:
     port: 8008
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/dehazing/maxim"
+    weight_dir: "AgentApp/weights/dehazing/maxim"
 
 denoising:
   Restormer:
     port: 8009
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/defocus_deblurring/Restormer/Denoising"
+    weight_dir: "AgentApp/weights/defocus_deblurring/Restormer/Denoising"
   XRestormer:
     port: 8010
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/denoising/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
+    config: "AgentApp/model_service/denoising/X-Restormer/xrestormer.yml"
+    model_path: "AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
   MAXIM:
     port: 8011
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/denoising/maxim"
+    weight_dir: "AgentApp/weights/denoising/maxim"
   MPRNet:
     port: 8012
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/denoising/MPRNet"
+    weight_dir: "AgentApp/weights/denoising/MPRNet"
   SwinIR:
     port: 8013
     host: "0.0.0.0"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/denoising/SwinIR/005_colorDN_DFWB_s128w8_SwinIR-M_noise15.pth"
+    model_path: "AgentApp/weights/denoising/SwinIR/005_colorDN_DFWB_s128w8_SwinIR-M_noise15.pth"
 
 deraining:
   MPRNet:
     port: 8014
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/deraining/MPRNet"
+    weight_dir: "AgentApp/weights/deraining/MPRNet"
   Restormer:
     port: 8015
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/deraining/Restormer/Deraining"
+    weight_dir: "AgentApp/weights/deraining/Restormer/Deraining"
   XRestormer:
     port: 8016
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/deraining/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/deraining/X-Restormer/Deraining/net_g_155000.pth"
+    config: "AgentApp/model_service/deraining/X-Restormer/xrestormer.yml"
+    model_path: "AgentApp/weights/deraining/X-Restormer/Deraining/net_g_155000.pth"
   MAXIM:
     port: 8017
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/deraining/maxim"
+    weight_dir: "AgentApp/weights/deraining/maxim"
 
 jpeg_compression_artifact_removal:
   SwinIR:
     port: 8018
     host: "0.0.0.0"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/jpeg_compression_artifact_removal/SwinIR/006_colorCAR_DFWB_s126w7_SwinIR-M_jpeg40.pth"
+    model_path: "AgentApp/weights/jpeg_compression_artifact_removal/SwinIR/006_colorCAR_DFWB_s126w7_SwinIR-M_jpeg40.pth"
   FBCNN:
     port: 8019
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/jpeg_compression_artifact_removal/FBCNN"
+    weight_dir: "AgentApp/weights/jpeg_compression_artifact_removal/FBCNN"
 
 motion_deblurring:
   MPRNet:
     port: 8020
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/motion_deblurring/MPRNet"
+    weight_dir: "AgentApp/weights/motion_deblurring/MPRNet"
   Restormer:
     port: 8021
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/motion_deblurring/Restormer/Motion_Deblurring"
+    weight_dir: "AgentApp/weights/motion_deblurring/Restormer/Motion_Deblurring"
   XRestormer:
     port: 8022
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/motion_deblurring/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/motion_deblurring/X-Restormer/Deblurring/net_g_latest.pth"
+    config: "AgentApp/model_service/motion_deblurring/X-Restormer/xrestormer.yml"
+    model_path: "AgentApp/weights/motion_deblurring/X-Restormer/Deblurring/net_g_latest.pth"
   MAXIM:
     port: 8023
     host: "0.0.0.0"
-    weight_dir: "/home/jason/Auto-Image-Restoration/AgentApp/weights/motion_deblurring/maxim"
+    weight_dir: "AgentApp/weights/motion_deblurring/maxim"
 
 super_resolution:
   SwinIR:
     port: 8024
     host: "0.0.0.0"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/SwinIR/003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_PSNR.pth"
+    model_path: "AgentApp/weights/super_resolution/SwinIR/003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_PSNR.pth"
   XRestormer:
     port: 8025
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/super_resolution/X-Restormer/xrestormer.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/X-Restormer/SR/net_g_latest.pth"
+    config: "AgentApp/model_service/super_resolution/X-Restormer/xrestormer.yml"
+    model_path: "AgentApp/weights/super_resolution/X-Restormer/SR/net_g_latest.pth"
   DiffBIR:
     port: 8026
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/super_resolution/DiffBIR/diffbir.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/DiffBIR/general_full_v1.ckpt"
-    swinir_ckpt_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/DiffBIR/general_swinir_v1.ckpt"
+    config: "AgentApp/model_service/super_resolution/DiffBIR/diffbir.yml"
+    model_path: "AgentApp/weights/super_resolution/DiffBIR/general_full_v1.ckpt"
+    swinir_ckpt_path: "AgentApp/weights/super_resolution/DiffBIR/general_swinir_v1.ckpt"
   HAT:
     port: 8027
     host: "0.0.0.0"
-    config: "/home/jason/Auto-Image-Restoration/AgentApp/model_service/super_resolution/HAT/hat.yml"
-    model_path: "/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/HAT/HAT-L_SRx4_ImageNet-pretrain.pth"
+    config: "AgentApp/model_service/super_resolution/HAT/hat.yml"
+    model_path: "AgentApp/weights/super_resolution/HAT/HAT-L_SRx4_ImageNet-pretrain.pth"
+
+depictqa:
+  app_comp:
+    port: 5002
+    host: "0.0.0.0"
+  app_eval:
+    port: 6006
+    host: "0.0.0.0"
+
+main:
+  agentapp:
+    port: 1146
+    host: "0.0.0.0"
 
 default:
   log_level: "INFO"
   base_port: 8000
   timeout_seconds: 30
+
 
