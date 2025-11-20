@@ -1,5 +1,5 @@
 GPT:
-  API_KEY: "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"
+  API_KEY: ""
   MODEL: "gpt-4-turbo"
   MAX_TOKENS: 3000
   TEMPERATURE: 0.0
