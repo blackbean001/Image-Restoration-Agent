@@ -294,10 +294,11 @@ def run_agent():
     invoke_dict = {}
 
     AgenticIR_dir = Path("../AgenticIR")
-    CLIP4CIR_model_dir = Path("../AgenticIR/retrival_database/CLIP4Cir/models")
+    CLIP4CIR_model_dir = Path("../AgenticIR/retrival_database/CLIP4CIR/models")
 
     # set input_img_path
-    invoke_dict["input_img_path"] = "./demo_input/001.png"
+    invoke_dict["input_img_path"] = "./demo_input/input.png"
+
     invoke_dict["image"] = None
 
     invoke_dict["depictqa"] = get_depictqa()
@@ -338,6 +339,11 @@ def run_agent():
     invoke_dict["task_id"] = ""
     invoke_dict["tool_execution_count"] = 0
     invoke_dict["executed_plans"] = []
+    
+    os.makedirs(invoke_dict["tmp_input_dir"], exist_ok=True)
+    os.makedirs(invoke_dict["tmp_output_dir"], exist_ok=True)
+
+    shutil.copy(invoke_dict["input_img_path"], invoke_dict["tmp_input_dir"])
 
     # compile and run
     app = create_image_analysis_graph()

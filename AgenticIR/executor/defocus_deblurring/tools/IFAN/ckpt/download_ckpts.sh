@@ -1,0 +1,1 @@
+/home/jason/Auto-Image-Restoration/AgentApp/weights/defocus_deblurring/IFAN/download_ckpts.sh

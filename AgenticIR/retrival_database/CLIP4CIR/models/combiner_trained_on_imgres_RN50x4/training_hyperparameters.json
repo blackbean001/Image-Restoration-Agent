@@ -1,0 +1,15 @@
+{
+    "batch_size": 1280,
+    "clip_bs": 96,
+    "clip_model_name": "RN50x4",
+    "clip_model_path": "./models/clip_finetuned_on_imgres_RN50x4_2025-09-05_10:48:31/saved_models/tuned_clip_arithmetic.pt",
+    "combiner_lr": 2e-05,
+    "hidden_dim": 5120,
+    "num_epochs": 50,
+    "projection_dim": 2560,
+    "save_best": true,
+    "save_training": true,
+    "target_ratio": 1.25,
+    "transform": "targetpad",
+    "validation_frequency": 1
+}

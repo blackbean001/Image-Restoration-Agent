@@ -26,22 +26,36 @@ RUN apt-get update  \
 
 # download model weights
 RUN pip install gdown==5.2.0  \
-  && cd /app/AgentApp/weights/defocus_deblurring/DRBNet && python download_ckpts.py  \
-  && cd /app/AgentApp/weights/defocus_deblurring/IFAN && sh download_ckpts.sh  \
-  && cd /app/AgentApp/weights/defocus_deblurring/Restormer && python download_ckpt.py  \
-  && cd /app/AgentApp/weights/dehazing/DehazeFormer && python download_ckpt.py  \
-  && cd /app/AgentApp/weights/dehazing/RIDCP_dehazing && python download_ckpts.py  \
-  && cd /app/AgentApp/weights/dehazing/X-Restormer && python download_ckpts.py  \
-  && cd /app/AgentApp/weights/dehazing/maxim && python download_ckpts.py \
-  && cd /app/AgentApp/weights/denoising/MPRNet && python download_ckpts.py \
-  && cd /app/AgentApp/weights/denoising/SwinIR && python download_ckpts.py \
-  && cd /app/AgentApp/weights/jpeg_compression_artifact_removal/FBCNN && sh download_ckpt.sh \
-  && cd /app/AgentApp/weights/super_resolution/DiffBIR && sh download_ckpt.sh \
-  && cd /app/AgentApp/weights/super_resolution/HAT && python download_ckpts.py \
-  && cd /app/AgenticIR/retrival_database/CLIP4CIR/models && python download_ckpts.py \
+  && cd /app/./AgentApp/weights/defocus_deblurring/DRBNet && python download_ckpts.py  \
+  && cd /app/./AgentApp/weights/defocus_deblurring/IFAN && sh download_ckpts.sh  \
+  && cd /app/./AgentApp/weights/defocus_deblurring/Restormer && python download_ckpt.py  \
+  && cd /app/./AgentApp/weights/dehazing/DehazeFormer && python download_ckpt.py  \
+  && cd /app/./AgentApp/weights/dehazing/RIDCP_dehazing && python download_ckpts.py  \
+  && cd /app/./AgentApp/weights/dehazing/X-Restormer && python download_ckpts.py  \
+  && cd /app/./AgentApp/weights/dehazing/maxim && python download_ckpts.py \
+  && cd /app/./AgentApp/weights/denoising/MPRNet && python download_ckpts.py \
+  && cd /app/./AgentApp/weights/denoising/SwinIR && python download_ckpts.py \
+  && cd /app/./AgentApp/weights/jpeg_compression_artifact_removal/FBCNN && sh download_ckpt.sh \
+  && cd /app/./AgentApp/weights/super_resolution/DiffBIR && sh download_ckpt.sh \
+  && cd /app/./AgentApp/weights/super_resolution/HAT && python download_ckpts.py \
+  && cd /app/./AgenticIR/retrival_database/CLIP4CIR/models && python download_ckpts.py \
 \
-  && cd /app/Auto-Image-Restoration/AgenticIR/DepictQA/weights && sh download_ViT-L-14.sh \
-  && sh download_vicuna-7b-v1.5.sh && cd delta && sh download_Abstractor.sh && sh download_degra_eval.sh
+  && cd /app/./AgenticIR/DepictQA/weights && sh download_ViT-L-14.sh  \
+  && sh download_vicuna-7b-v1.5.sh && cd delta && sh download_Abstractor.sh && sh download_degra_eval.sh  \
+
+# link weights in AgenticIR to AgenticApp
+RUN ln -s /app/./AgentApp/weights/defocus_deblurring/DRBNet/ckpts/* /app/./AgenticIR/executor/defocus_deblurring/tools/DRBNet/ckpts  \
+  && mkdir -p /app/./AgenticIR/executor/defocus_deblurring/tools/IFAN/ckpt && ln -s /app/./AgentApp/weights/defocus_deblurring/IFAN/* /app/./AgenticIR/executor/defocus_deblurring/tools/IFAN/ckpt/  \
+  && ln -s /app/./AgentApp/weights/defocus_deblurring/Restormer/Defocus_Deblurring/* /app/./AgenticIR/executor/defocus_deblurring/tools/Restormer/Defocus_Deblurring/pretrained_models  && ln -s /app/./AgentApp/weights/defocus_deblurring/Restormer/Denoising/* /app/./AgenticIR/executor/defocus_deblurring/tools/Restormer/Denoising/pretrained_models && ln -s /app/./AgentApp/weights/defocus_deblurring/Restormer/Deraining/* /app/./AgenticIR/executor/defocus_deblurring/tools/Restormer/Deraining/pretrained_models && ln -s /app/./AgentApp/weights/motion_deblurring/Restormer/Motion_Deblurring/* /app/./AgenticIR/executor/motion_deblurring/tools/Restormer/Motion_Deblurring/pretrained_models  \
+  && ln -s /app/./AgentApp/weights/dehazing/DehazeFormer/saved_models /app/./AgenticIR/executor/dehazing/tools/DehazeFormer && ln -s /app/./AgentApp/weights/dehazing/DehazeFormer/saved_models/indoor/dehazeformer-b.pth /app/./AgentApp/weights/dehazing/DehazeFormer/saved_models/  \
+  && mkdir -p /app/./AgenticIR/executor/dehazing/tools/RIDCP_dehazing/pretrained_models && ln -s /app/./AgentApp/weights/dehazing/RIDCP_dehazing/pretrained_RIDCP.pth /app/./AgenticIR/executor/dehazing/tools/RIDCP_dehazing/pretrained_models  \
+  && mkdir -p /app/./AgenticIR/executor/dehazing/tools/X-Restormer/experiments/pretrained && ln -s /app/./AgentApp/weights/dehazing/X-Restormer/*.pth /app/./AgenticIR/executor/dehazing/tools/X-Restormer/experiments/pretrained  \
+  && mkdir -p /app/./AgenticIR/executor/dehazing/tools/maxim/maxim/checkpoints && ln -s /app/./AgentApp/weights/dehazing/maxim/* /app/./AgenticIR/executor/dehazing/tools/maxim/maxim/checkpoints  \
+  && ln -s /app/./AgentApp/weights/motion_deblurring/MPRNet/model_deblurring.pth /app/./AgenticIR/executor/denoising/tools/MPRNet/Deblurring/pretrained_models/ && ln -s /app/./AgentApp/weights/motion_deblurring/MPRNet/model_denoising.pth /app/./AgenticIR/executor/denoising/tools/MPRNet/Denoising/pretrained_models/ && ln -s /app/./AgentApp/weights/motion_deblurring/MPRNet/model_deraining.pth /app/./AgenticIR/executor/denoising/tools/MPRNet/Deraining/pretrained_models/  \
+  && ln -s /app/./AgentApp/weights/jpeg_compression_artifact_removal/FBCNN/*.pth /app/./AgenticIR/executor/jpeg_compression_artifact_removal/tools/FBCNN/model_zoo  \
+  && ln -s /app/./AgentApp/weights/jpeg_compression_artifact_removal/SwinIR/*.pth /app/./AgenticIR/executor/jpeg_compression_artifact_removal/tools/SwinIR/model_zoo  \
+  && mkdir -p /app/./AgenticIR/executor/super_resolution/tools/DiffBIR/weights && ln -s /app/./AgentApp/weights/super_resolution/DiffBIR/* /app/./AgenticIR/executor/super_resolution/tools/DiffBIR/weights  \
+  && ln -s /app/./AgentApp/weights/super_resolution/HAT/*.pth /app/./AgenticIR/executor/super_resolution/tools/HAT/experiments/pretrained_models
 
 # build environment
 RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
@@ -113,7 +127,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && pip install flask flask_cors ptflops lpips pyyaml \
   && conda install -y pytorch=1.1 torchvision=0.3 cudatoolkit=9.0 -c pytorch  \
   && pip install matplotlib scikit-image opencv-python yacs joblib natsort h5py tqdm  \
-  && cd /app/Auto-Image-Restoration/AgenticIR/executor/denoising/tools/MPRNet/pytorch-gradual-warmup-lr && python setup.py install  \
+  && cd /app/./AgenticIR/executor/denoising/tools/MPRNet/pytorch-gradual-warmup-lr && python setup.py install  \
 \
   && conda create -y -n restormer python=3.7.16  \
   && source activate restormer  \

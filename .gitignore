@@ -1,0 +1,44 @@
+# ---- Deep Learning / ML model files ----
+
+.git
+
+# PyTorch
+*.pt
+*.pth
+*.ckpt
+*.ptl
+*.pytorch
+
+# TensorFlow / Keras
+*.pb
+*.h5
+*.hdf5
+*.keras
+*.tflite
+*.lite
+
+# ONNX
+*.onnx
+*.ort
+
+# JAX / Flax / NumPy weight dumps
+*.npz
+*.npy
+*.msgpack
+
+# HuggingFace transformers
+*.safetensors
+tokenizer.json
+vocab.txt
+merges.txt
+special_tokens_map.json
+*.bin
+
+# TensorRT
+*.engine
+*.plan
+
+# Checkpoints & logs
+checkpoint*
+*.ckpt.*
+events.out.tfevents.*

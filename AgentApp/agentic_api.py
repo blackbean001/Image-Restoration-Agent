@@ -83,7 +83,7 @@ async def image_restoration_endpoint(
         invoke_dict = {}
 
         AgenticIR_dir = Path("../AgenticIR")
-        CLIP4CIR_model_dir = Path("../AgenticIR/retrival_database/CLIP4Cir/models")
+        CLIP4CIR_model_dir = Path("../AgenticIR/retrival_database/CLIP4CIR/models")
 
         # set input_img_path
         invoke_dict["input_img_path"] = "./demo_input/001.png"

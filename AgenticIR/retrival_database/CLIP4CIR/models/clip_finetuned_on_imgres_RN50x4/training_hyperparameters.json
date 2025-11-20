@@ -1,0 +1,12 @@
+{
+    "batch_size": 48,
+    "clip_model_name": "RN50x4",
+    "encoder": "both",
+    "learning_rate": 2e-06,
+    "num_epochs": 80,
+    "save_best": true,
+    "save_training": true,
+    "target_ratio": 1.25,
+    "transform": "targetpad",
+    "validation_frequency": 1
+}

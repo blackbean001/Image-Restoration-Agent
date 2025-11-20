@@ -1,0 +1,1 @@
+/home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/DiffBIR/download_ckpt.sh
