@@ -132,9 +132,10 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
 \
   && conda create -y -n restormer python=3.7.16  \
   && source activate restormer  \
-  && pip install flask flask_cors ptflops lpips pyyaml \
   && pip install -r /app/AgenticIR/executor/denoising/tools/Restormer/requirements.txt  \
-\
+  && pip install flask flask_cors ptflops lpips pyyaml \
+  && pip install numpy==1.26.4  \
+\ 
   && conda create -y -n ridcp python=3.8.20  \
   && source activate ridcp  \
   && pip install flask flask_cors ptflops lpips pyyaml \
