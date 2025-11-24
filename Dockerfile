@@ -150,6 +150,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && source activate xrestormer  \
   && pip install flask flask_cors ptflops lpips pyyaml \
   && pip install -r /app/AgenticIR/executor/denoising/tools/X-Restormer/requirements.txt  \
+  && pip install numpy==1.26.4  \
   && python setup.py develop  \
   && sed -i '8s/.*/from torchvision.transforms.functional import rgb_to_grayscale/' /opt/conda/envs/xrestormer/lib/python3.10/site-packages/basicsr/data/degradations.py
 

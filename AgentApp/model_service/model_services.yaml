@@ -43,7 +43,7 @@ dehazing:
     port: 8007
     host: "0.0.0.0"
     config: "AgentApp/model_service/dehazing/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/dehazing/X-Restormer/Dehazing/dehaze_300k.pth"
+    model_path: "AgentApp/weights/dehazing/X-Restormer/dehaze_300k.pth"
   MAXIM:
     port: 8008
     host: "0.0.0.0"
@@ -58,7 +58,7 @@ denoising:
     port: 8010
     host: "0.0.0.0"
     config: "AgentApp/model_service/denoising/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/denoising/X-Restormer/Denoising/denoise_300k.pth"
+    model_path: "AgentApp/weights/denoising/X-Restormer/denoise_300k.pth"
   MAXIM:
     port: 8011
     host: "0.0.0.0"
@@ -85,7 +85,7 @@ deraining:
     port: 8016
     host: "0.0.0.0"
     config: "AgentApp/model_service/deraining/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/deraining/X-Restormer/Deraining/net_g_155000.pth"
+    model_path: "AgentApp/weights/deraining/X-Restormer/net_g_155000.pth"
   MAXIM:
     port: 8017
     host: "0.0.0.0"
@@ -114,7 +114,7 @@ motion_deblurring:
     port: 8022
     host: "0.0.0.0"
     config: "AgentApp/model_service/motion_deblurring/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/motion_deblurring/X-Restormer/Deblurring/net_g_latest.pth"
+    model_path: "AgentApp/weights/motion_deblurring/X-Restormer/net_g_latest.pth"
   MAXIM:
     port: 8023
     host: "0.0.0.0"
@@ -129,7 +129,7 @@ super_resolution:
     port: 8025
     host: "0.0.0.0"
     config: "AgentApp/model_service/super_resolution/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/super_resolution/X-Restormer/SR/net_g_latest.pth"
+    model_path: "AgentApp/weights/super_resolution/X-Restormer/net_g_latest.pth"
   DiffBIR:
     port: 8026
     host: "0.0.0.0"
