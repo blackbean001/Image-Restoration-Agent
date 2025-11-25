@@ -85,7 +85,7 @@ deraining:
     port: 8016
     host: "0.0.0.0"
     config: "AgentApp/model_service/deraining/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/deraining/X-Restormer/net_g_155000.pth"
+    model_path: "AgentApp/weights/deraining/X-Restormer/derain_155k.pth"
   MAXIM:
     port: 8017
     host: "0.0.0.0"
@@ -114,7 +114,7 @@ motion_deblurring:
     port: 8022
     host: "0.0.0.0"
     config: "AgentApp/model_service/motion_deblurring/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/motion_deblurring/X-Restormer/net_g_latest.pth"
+    model_path: "AgentApp/weights/motion_deblurring/X-Restormer/deblur_300k.pth"
   MAXIM:
     port: 8023
     host: "0.0.0.0"
@@ -129,7 +129,7 @@ super_resolution:
     port: 8025
     host: "0.0.0.0"
     config: "AgentApp/model_service/super_resolution/X-Restormer/xrestormer.yml"
-    model_path: "AgentApp/weights/super_resolution/X-Restormer/net_g_latest.pth"
+    model_path: "AgentApp/weights/super_resolution/X-Restormer/sr_300k.pth"
   DiffBIR:
     port: 8026
     host: "0.0.0.0"

@@ -1,2 +1,5 @@
 torch
 numpy
+requests
+matplotlib
+opencv-python
