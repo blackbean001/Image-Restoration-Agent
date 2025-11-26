@@ -38,7 +38,7 @@ network_g:
 
 # path
 path:
-  pretrain_network_g: /home/jason/AgenticIR/executor/super_resolution/tools/HAT/experiments/pretrained_models/Real_HAT_GAN_SRx4.pth
+  pretrain_network: /home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/HAT/HAT-L_SRx4_ImageNet-pretrain.pth
   strict_load_g: true
   param_key_g: 'params_ema'
   results: results

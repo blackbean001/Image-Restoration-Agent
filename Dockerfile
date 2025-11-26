@@ -112,6 +112,8 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && pip install flask flask_cors ptflops lpips pyyaml \
   && pip install -r /${ROOT}/AgenticIR/executor/super_resolution/tools/HAT/requirements.txt  \
   && cd /${ROOT}/AgenticIR/executor/super_resolution/tools/HAT/ && python setup.py develop  \
+  && sed -i "s|from torchvision.transforms.functional_tensor import rgb_to_grayscale|from torchvision.transforms.functional import rgb_to_grayscale|" /opt/conda/envs/hat/lib/python3.10/site-packages/basicsr/data/degradations.py  \
+  && sed -i "s|from basicsr.utils.matlab_functions import imresize, rgb2ycbcr|from basicsr.utils.matlab_functions import imresize\nfrom basicsr.utils.color_util import rgb2ycbcr|" /${ROOT}/AgenticIR/executor/super_resolution/tools/HAT/hat/data/imagenet_paired_dataset.py  \
 \
   && conda create -y -n ifan python=3.8.20  \
   && source activate ifan  \

@@ -36,8 +36,9 @@ root_dir = cfg["root_dir"]
 port = cfg["super_resolution"]["HAT"]["port"]
 host = cfg["super_resolution"]["HAT"]["host"]
 opt_config = os.path.join(root_dir, cfg["super_resolution"]["HAT"]["config"])
-ckpt_path = os.path.join(root_dir, cfg["super_resolution"]["HAT"]["model_path"])
+print("opt_config: ", opt_config)
 
+ckpt_path = os.path.join(root_dir, cfg["super_resolution"]["HAT"]["model_path"])
 
 # app
 app = Flask(__name__)
@@ -98,7 +99,8 @@ def custom_parse_options_from_config(config_path, root_path, is_train=False):
         opt['path']['results_root'] = results_root
         opt['path']['log'] = results_root
         opt['path']['visualization'] = osp.join(results_root, 'visualization')
-        opt['path']['network_g'] = ckpt_path
+        opt['path']['pretrain_network'] = ckpt_path
+    print("opt: ", opt)
     return opt
 
 
