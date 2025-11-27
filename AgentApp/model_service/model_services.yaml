@@ -6,7 +6,7 @@ brightening:
   model_path: ""
   version: "1.0.0"
   description: "Conduct image brightening - constant_shift, gamma_correction, histogram_equalization"
-  curl_cmd: ""
+  curl_cmd: "curl -X GET \"http://localhost:8001/brighten?method=brightening_method\" -F \"file=@input_path\" --output \"output_path\""
 
 defocus_deblurring:
   DRBNet:
