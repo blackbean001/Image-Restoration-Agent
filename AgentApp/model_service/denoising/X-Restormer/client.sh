@@ -1,4 +1,3 @@
-/bash
 
 # XRestormer Image Dehazing Service API Test Script
 # Modify HOST and PORT according to your model_services.yaml configuration
