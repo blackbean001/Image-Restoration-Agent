@@ -25,26 +25,11 @@ echo "Prepare test image: test_image.png"
 echo ""
 
 # Example command - using image file
-cat << 'EOF'
-curl -X POST "${BASE_URL}/test" \
-  -F "image=@demo.png" \
-  -F "save_img=true"
-EOF
-
-echo ""
-echo "Actual execution example (replace image path):"
-# Execute if test image exists
-if [ -f "demo.png" ]; then
-    echo "Found demo.png, executing test..."
-    curl -X POST "${BASE_URL}/test" \
-      -F "image=@demo.png" \
-      -F "save_img=true"
-    echo ""
-else
-    echo -e "${YELLOW}demo.png not found, skipping execution${NC}"
-fi
-echo ""
-echo "=========================================="
-echo ""
+curl -X POST ${BASE_URL}/super_resolution \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_path": "demo.png",
+    "output_path": "output_sr.png"
+  }'
 
 

@@ -6,8 +6,7 @@ import yaml
 import argparse
 import random
 from collections import OrderedDict
-from flask import Flask, request, jsonify, send_file
-from werkzeug.utils import secure_filename
+from flask import Flask, request, jsonify
 import tempfile
 import shutil
 from threading import Lock
@@ -43,18 +42,10 @@ ckpt_path = os.path.join(root_dir, cfg["super_resolution"]["HAT"]["model_path"])
 # app
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
-app.config['UPLOAD_FOLDER'] = tempfile.mkdtemp()
-
 
 # Global model cache
 model_cache = {}
 model_lock = Lock()
-
-# Allowed extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'tiff'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def custom_parse_options_from_config(config_path, root_path, is_train=False):
@@ -93,12 +84,14 @@ def custom_parse_options_from_config(config_path, root_path, is_train=False):
     for key, val in opt['path'].items():
         if (val is not None) and ('resume_state' in key or 'pretrain_network' in key):
             opt['path'][key] = osp.expanduser(val)
-    
+
     if not is_train:
-        results_root = osp.join(opt['path'].get('results', root_path), opt['name'])
+        #results_root = osp.join(opt['path'].get('results', root_path), opt['name'])
+        results_root = "temp_output"
         opt['path']['results_root'] = results_root
         opt['path']['log'] = results_root
-        opt['path']['visualization'] = osp.join(results_root, 'visualization')
+        #opt['path']['visualization'] = osp.join(results_root, 'visualization')
+        opt['path']['visualization'] = results_root
         opt['path']['pretrain_network'] = ckpt_path
     print("opt: ", opt)
     return opt
@@ -134,65 +127,92 @@ def health_check():
     })
 
 
-@app.route('/test', methods=['POST'])
-def test_image():
+@app.route('/super_resolution', methods=['POST'])
+def super_resolution():
     """
-    Test endpoint for image super-resolution
-    Expected form data:
-    - config: path to YAML config file
-    - image: image file to process (optional if using dataset from config)
-    - save_img: whether to save output image (true/false)
+    Super resolution endpoint
+    Expected JSON data:
+    - input_path: path to input image file
+    - output_path: path to save output image
     """
+    temp_input_dir = None
+    temp_output_dir = None
+    
     try:
-        # Get config path
-
-        #root_path = request.form.get('root_path', osp.abspath(osp.join(__file__, osp.pardir)))
-        root_path = "./"
-        save_img = request.form.get('save_img', 'true').lower() == 'true'
-
-        # Update save_img option
-        if 'val' in OPT:
-            OPT['val']['save_img'] = save_img
+        data = request.get_json()
         
-        # Create test dataset and dataloader
-        test_loaders = []
-        for _, dataset_opt in sorted(OPT['datasets'].items()):
-            # If image file is provided, update dataroot_lq
-            if 'image' in request.files:
-                file = request.files['image']
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    temp_dir = tempfile.mkdtemp()
-                    filepath = osp.join(temp_dir, filename)
-                    file.save(filepath)
-                    dataset_opt['dataroot_lq'] = temp_dir
+        if not data or 'input_path' not in data or 'output_path' not in data:
+            return jsonify({'error': 'input_path and output_path are required'}), 400
 
+        input_path = data['input_path']
+        output_path = data['output_path']
+
+        if not osp.exists(input_path):
+            return jsonify({'error': f'Input file not found: {input_path}'}), 404
+
+        output_dir = osp.dirname(output_path)
+        if output_dir and not osp.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+
+        temp_input_dir = "temp_input"
+        temp_output_dir = "temp_output"
+        os.makedirs(temp_input_dir, exist_ok=True)
+        os.makedirs(temp_output_dir, exist_ok=True)
+
+        temp_input_file = osp.join(temp_input_dir, osp.basename(input_path))
+        shutil.copy2(input_path, temp_input_file)
+
+        temp_opt = OPT.copy()
+        temp_opt['path']['visualization'] = temp_output_dir
+        
+        test_loaders = []
+        for dataset_name, dataset_opt in sorted(temp_opt['datasets'].items()):
+            dataset_opt['dataroot_lq'] = temp_input_dir
+            
             test_set = build_dataset(dataset_opt)
             test_loader = build_dataloader(
-                test_set, dataset_opt, num_gpu=OPT['num_gpu'],
-                dist=OPT['dist'], sampler=None, seed=OPT['manual_seed'])
+                test_set, dataset_opt, num_gpu=temp_opt['num_gpu'],
+                dist=temp_opt['dist'], sampler=None, seed=temp_opt['manual_seed'])
             test_loaders.append(test_loader)
-        
-        # Run validation
-        results = []
+
         for test_loader in test_loaders:
             test_set_name = test_loader.dataset.opt['name']
-            MODEL.validation(test_loader, current_iter=OPT['name'],
-                           tb_logger=None, save_img=save_img)
-            results.append({
-                'dataset': test_set_name,
-                'num_images': len(test_loader.dataset),
-                'output_path': OPT['path']['visualization'] if save_img else None
-            })
+            MODEL.validation(test_loader, current_iter=temp_opt['name'],
+                           tb_logger=None, save_img=True)
         
+        print("temp_output_dir: ", temp_output_dir)
+        output_found = False
+        for root, dirs, files in os.walk(temp_output_dir):
+            for file in files:
+                if file.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
+                    generated_file = osp.join(root, file)
+                    print("generated_file: ", generated_file)
+                    print("output_path: ", output_path)
+                    shutil.copy2(generated_file, output_path)
+                    output_found = True
+                    break
+            if output_found:
+                break
+
+        #if not output_found:
+        #    return jsonify({'error': 'No output image generated'}), 500
+
         return jsonify({
             'status': 'success',
-            'results': results,
+            'input_path': input_path,
+            'output_path': output_path,
+            'message': 'Super resolution completed successfully'
         })
 
     except Exception as e:
-        logging.error(f"Error during testing: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        logging.error(f"Error during super resolution: {str(e)}")
+        return jsonify({'error': f'Processing failed: {str(e)}'}), 500
+    
+    finally:
+        if temp_input_dir and osp.exists(temp_input_dir):
+            shutil.rmtree(temp_input_dir, ignore_errors=True)
+        if temp_output_dir and osp.exists(temp_output_dir):
+            shutil.rmtree(temp_output_dir, ignore_errors=True)
 
 
 @app.route('/clear_cache', methods=['POST'])
@@ -209,7 +229,7 @@ if __name__ == '__main__':
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
-    
+
     # Run Flask app
     app.run(
         host=host,
@@ -217,15 +237,6 @@ if __name__ == '__main__':
         debug=False,
         threaded=True
     )
-
-
-
-
-
-
-
-
-
 
 
 

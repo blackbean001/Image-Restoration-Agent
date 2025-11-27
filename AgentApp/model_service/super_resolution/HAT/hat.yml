@@ -41,7 +41,7 @@ path:
   pretrain_network: /home/jason/Auto-Image-Restoration/AgentApp/weights/super_resolution/HAT/HAT-L_SRx4_ImageNet-pretrain.pth
   strict_load_g: true
   param_key_g: 'params_ema'
-  results: results
+  results: temp_output
 
 # validation settings
 val:

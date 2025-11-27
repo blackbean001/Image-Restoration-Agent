@@ -6,6 +6,7 @@ brightening:
   model_path: ""
   version: "1.0.0"
   description: "Conduct image brightening - constant_shift, gamma_correction, histogram_equalization"
+  curl_cmd: ""
 
 defocus_deblurring:
   DRBNet:
@@ -14,6 +15,7 @@ defocus_deblurring:
     model_path:
       dual: "AgentApp/weights/defocus_deblurring/DRBNet/ckpts/dual/dual_images_defocus_deblurring.pth"
       single: "AgentApp/weights/defocus_deblurring/DRBNet/ckpts/single/single_image_defocus_deblurring.pth"  
+    curl_cmd: "curl -X POST \"http://localhost:8002/api/v1/deblur/single\" -F \"image=@input_path\" -F \"format=image\" -o output_path"
   IFAN:
     port: 8003
     host: "0.0.0.0"
@@ -22,11 +24,13 @@ defocus_deblurring:
     mode: "IFAN"
     project: "ImgRes_AgentApp"
     ckpt_name: "IFAN.pytorch"
-    ckpt_abs: "AgentApp/weights/defocus_deblurring/IFAN/IFAN.pytorch"  
+    ckpt_abs: "AgentApp/weights/defocus_deblurring/IFAN/IFAN.pytorch"
+    curl_cmd: "curl -X POST \"http://localhost:8003/deblur\" -F \"image=@input_path\" -F \"format=jpg\" -o output_path"
   Restormer:
     port: 8004
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/defocus_deblurring/Restormer/Defocus_Deblurring"
+    curl_cmd: "curl -X POST \"http://localhost:8004/restore\" -F \"image=@input_path\" -F \"tile=512\" -F \"tile_overlap=32\" --output output_path"
 
 dehazing:
   Dehazeformer:
@@ -34,113 +38,135 @@ dehazing:
     host: "0.0.0.0"
     model_name: "dehazeformer-b"
     model_path: "AgentApp/weights/dehazing/DehazeFormer/saved_models/indoor/dehazeformer-b.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8005/dehaze\" -F \"image=@input_path\" -o \"output_path\""
   RIDCP:
     port: 8006
     host: "0.0.0.0"
     weight_path: "AgentApp/weights/dehazing/RIDCP_dehazing/pretrained_RIDCP.pth"
     alpha: "-21.25"
+    curl_cmd: "curl -X POST http://localhost:8006/dehaze -F \"image=@input_path\" -F \"max_size=1500\" -F \"return_type=file\" -o output_path"
   XRestormer:
     port: 8007
     host: "0.0.0.0"
     config: "AgentApp/model_service/dehazing/X-Restormer/xrestormer.yml"
     model_path: "AgentApp/weights/dehazing/X-Restormer/dehaze_300k.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8007/process\" -F \"image=@input_path\" -o \"output_path\""
   MAXIM:
     port: 8008
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/dehazing/maxim"
+    curl_cmd: "curl -X POST \"http://localhost:8008/predict\" -F \"image=@input_path\" -F \"task=Dehazing\" -F \"geometric_ensemble=false\" -F \"ensemble_times=8\" -F \"return_format=image\" --output result.png"
 
 denoising:
   Restormer:
     port: 8009
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/defocus_deblurring/Restormer/Denoising"
+    curl_cmd: "curl -X POST \"http://localhost:8009/restore\" -F \"image=input_path\" -F \"task=Real_Denoising\" --output output_path"
   XRestormer:
     port: 8010
     host: "0.0.0.0"
     config: "AgentApp/model_service/denoising/X-Restormer/xrestormer.yml"
     model_path: "AgentApp/weights/denoising/X-Restormer/denoise_300k.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8010/process\" -F \"image=input_path\" -o \"output_path\""
   MAXIM:
     port: 8011
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/denoising/maxim"
+    curl_cmd: "curl -X POST \"http://localhost:8011/predict\" -F \"image=input_path\" -F \"task=Denoising\" -F \"geometric_ensemble=false\" -F \"ensemble_times=8\" -F \"return_format=image\" --output output_path"
   MPRNet:
     port: 8012
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/denoising/MPRNet"
+    curl_cmd: "curl -X POST \"http://localhost:8012/process\" -F \"file=input_path\" -F \"task=Denoising\" -o output_path"
   SwinIR:
     port: 8013
     host: "0.0.0.0"
     model_path: "AgentApp/weights/denoising/SwinIR/005_colorDN_DFWB_s128w8_SwinIR-M_noise15.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8013/predict\" -F \"image=@demo.png\" -F \"task=color_dn\" -F \"scale=4\" -F \"noise=15\" -F \"jpeg=40\" -F \"large_model=false\" -F \"tile_overlap=32\" -F \"return_type=file\" --output output_path"
 
 deraining:
   MPRNet:
     port: 8014
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/deraining/MPRNet"
+    curl_cmd: "curl -X POST \"http://localhost:8014/process\" -F \"file=@input_path\" -F \"task=Deraining\" -o output_path"
   Restormer:
     port: 8015
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/deraining/Restormer/Deraining"
+    curl_cmd: "curl -X POST \"http://localhost:8015/restore\" -F \"image=@input_path\" -F \"tile=512\" -F \"tile_overlap=32\" --output output_path"
   XRestormer:
     port: 8016
     host: "0.0.0.0"
     config: "AgentApp/model_service/deraining/X-Restormer/xrestormer.yml"
     model_path: "AgentApp/weights/deraining/X-Restormer/derain_155k.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8016/process\" -F \"image=@inputs/demo.png\" -o \"output_path\""
   MAXIM:
     port: 8017
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/deraining/maxim"
+    curl_cmd: "curl -X POST \"http://localhost:8017/predict\" -F \"image=@input_path\" -F \"task=Deraining\" -F \"geometric_ensemble=false\" -F \"ensemble_times=8\" -F \"return_format=image\" --output output_path"
 
 jpeg_compression_artifact_removal:
   SwinIR:
     port: 8018
     host: "0.0.0.0"
     model_path: "AgentApp/weights/jpeg_compression_artifact_removal/SwinIR/006_colorCAR_DFWB_s126w7_SwinIR-M_jpeg40.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8018/predict\" -F \"image=@input_path\" -F \"task=color_jpeg_car\" -F \"scale=4\" -F \"noise=15\" -F \"jpeg=40\" -F \"large_model=false\" -F \"tile_overlap=32\" -F \"return_type=file\" --output output_path"
   FBCNN:
     port: 8019
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/jpeg_compression_artifact_removal/FBCNN"
-
+    curl_cmd: 'curl -X POST http://localhost:8019/denoise -H "Content-Type: application/json" -d ''{"input_path": "input_path", "output_path": "output_path"}'''
 motion_deblurring:
   MPRNet:
     port: 8020
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/motion_deblurring/MPRNet"
+    curl_cmd: "curl -X POST \"http://localhost:8020/process\" -F \"file=@input_path\" -F \"task=Deblurring\" -o output_path"
   Restormer:
     port: 8021
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/motion_deblurring/Restormer/Motion_Deblurring"
+    curl_cmd: "curl -X POST \"http://localhost:8021/restore\" -F \"image=@input_path\" -F \"tile=512\" -F \"tile_overlap=32\" --output output_path"
   XRestormer:
     port: 8022
     host: "0.0.0.0"
     config: "AgentApp/model_service/motion_deblurring/X-Restormer/xrestormer.yml"
     model_path: "AgentApp/weights/motion_deblurring/X-Restormer/deblur_300k.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8022/process\" -F \"image=@input_path\" -o \"output_path\""
   MAXIM:
     port: 8023
     host: "0.0.0.0"
     weight_dir: "AgentApp/weights/motion_deblurring/maxim"
+    curl_cmd: "curl -X POST \"http://localhost:8023/predict\" -F \"image=input_path\" -F \"task=Deblurring\" -F \"geometric_ensemble=false\" -F \"ensemble_times=8\" -F \"return_format=image\" --output output_path"
 
 super_resolution:
   SwinIR:
     port: 8024
     host: "0.0.0.0"
     model_path: "AgentApp/weights/super_resolution/SwinIR/003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_PSNR.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8024/predict\" -F \"image=input_path\" -F \"task=real_sr\" -F \"scale=4\" -F \"large_model=true\" -F \"return_type=file\" --output output_path"
   XRestormer:
     port: 8025
     host: "0.0.0.0"
     config: "AgentApp/model_service/super_resolution/X-Restormer/xrestormer.yml"
     model_path: "AgentApp/weights/super_resolution/X-Restormer/sr_300k.pth"
+    curl_cmd: "curl -X POST \"http://localhost:8025/process\" -F \"image=@input_path\" -o \"output_path\""
   DiffBIR:
     port: 8026
     host: "0.0.0.0"
     config: "AgentApp/model_service/super_resolution/DiffBIR/diffbir.yml"
     model_path: "AgentApp/weights/super_resolution/DiffBIR/general_full_v1.ckpt"
     swinir_ckpt_path: "AgentApp/weights/super_resolution/DiffBIR/general_swinir_v1.ckpt"
+    curl_cmd: "curl -X POST \"http://localhost:8026/inference_file\" -F \"image=@input_path\" -o output_path"
   HAT:
     port: 8027
     host: "0.0.0.0"
     config: "AgentApp/model_service/super_resolution/HAT/hat.yml"
     model_path: "AgentApp/weights/super_resolution/HAT/HAT-L_SRx4_ImageNet-pretrain.pth"
+    curl_cmd: 'curl -X POST ${BASE_URL}/super_resolution -H "Content-Type: application/json" -d ''{"input_path": "input_path", "output_path": "output_path"}'''
 
 depictqa:
   app_comp:
