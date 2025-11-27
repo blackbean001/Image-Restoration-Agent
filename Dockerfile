@@ -16,7 +16,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # build postgresql environment
 RUN apt-get update  \
-  && apt-get install -y git vim unzip curl wget \
+  && apt-get install -y git vim unzip curl wget netcat \
   && apt-get install -y postgresql postgresql-client  \
   && apt-get install git-lfs && git-lfs install  \
   && pip install pgvector  && apt install -y postgresql-server-dev-14  \
@@ -90,6 +90,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && source activate dehazeformer  \
   && pip install flask flask_cors ptflops lpips pyyaml  \
   && pip install -r /${ROOT}/AgenticIR/executor/dehazing/tools/DehazeFormer/requirements.txt  \
+  && pip install numpy==1.24.1  \
 \
   && conda create -y -n diffbir python=3.10  \
   && source activate diffbir \
@@ -127,11 +128,11 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html  \
   && cd /${ROOT}/AgenticIR/executor/denoising/tools/maxim && pip install .  \
 \
-  && conda create -y -n mprnet python=3.7.16  \
+  && conda create -y -n mprnet python=3.8.20  \
   && source activate mprnet  \
   && pip install flask flask_cors ptflops lpips pyyaml \
-  && conda install -y pytorch=1.1 torchvision=0.3 cudatoolkit=9.0 -c pytorch  \
-  && pip install matplotlib scikit-image opencv-python yacs joblib natsort h5py tqdm  \
+  && pip install torch torchvision opencv-python \
+  && pip install matplotlib scikit-image yacs joblib natsort h5py tqdm  \
   && pip install "Pillow<7"  \
   && cd /${ROOT}/./AgenticIR/executor/denoising/tools/MPRNet/pytorch-gradual-warmup-lr && python setup.py install  \
 \
