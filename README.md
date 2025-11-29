@@ -4,7 +4,7 @@
    (1) We rebuilt the end-to-end pipeline with LangGraph for better states management and efficiency.
    (2) We replaced offline model inference with service-based inference to be suitable for production-level deployment. 
    (3) We try to accelerate the restoration process by using CLIP4CIR (https://github.com/ABaldrati/CLIP4Cir/tree/master) to find similar images in the database.
-   (4) We are trying to take advantage of GPU pooling technology (like NexusGPU <https://github.com/NexusGPU/tensor-fusion>) to improve GPU utilization rate when there are a bunch of non-LLM model services.
+   (4) We are trying to take advantage of GPU pooling technology like NexusGPU (<https://github.com/NexusGPU/tensor-fusion>) to improve GPU utilization rate when there are a bunch of non-LLM model services.
 
 **AgenticIR**:   
 1. Run "docker build ." to create environment. One can use "conda env list" to check env for different models.
