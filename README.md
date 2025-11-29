@@ -1,9 +1,10 @@
 **Intro**    
 1. This repo contains an agent system for images restoration with mixed degradation.
 2. The repo is inspired by AgenticIR (https://github.com/Kaiwen-Zhu/AgenticIR) with following improvements:
-   (1) We rebuilt the end-to-end pipeline with LangGraph for better state management and efficiency.
-   (2) We replaced offline model inference with service-based inference to prepare for production-level deployment (in progress). 
+   (1) We rebuilt the end-to-end pipeline with LangGraph for better states management and efficiency.
+   (2) We replaced offline model inference with service-based inference to be suitable for production-level deployment. 
    (3) We try to accelerate the restoration process by using CLIP4CIR (https://github.com/ABaldrati/CLIP4Cir/tree/master) to find similar images in the database.
+   (4) We are trying to take advantage of GPU pooling technology (like NexusGPU <https://github.com/NexusGPU/tensor-fusion>) to improve GPU utilization rate when there are a bunch of non-LLM model services.
 
 **AgenticIR**:   
 1. Run "docker build ." to create environment. One can use "conda env list" to check env for different models.
@@ -16,8 +17,9 @@
 3. Service enabled by FastAPI, run 'test_api.sh' to test.
 
 **To-dos**:   
-1. Change model inference to service request.
-2. Inference acceleration.
-3. Provide option for Kubernetes deployment, and use MPS or Time-Slicing to improve GPUs utilization.  
+1. Change model inference to service request. (&#10004)
+2. Provide option for Kubernetes deployment, and use polling, mps or time-slicing to improve GPUs utilization.
+3. Inference acceleration for each individual model.
+
 
 ![image](https://github.com/blackbean001/Auto-Image-Restoration/blob/main/pngs/pipeline.png)
