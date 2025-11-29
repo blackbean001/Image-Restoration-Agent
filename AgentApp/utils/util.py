@@ -22,6 +22,21 @@ from pipeline.insert_emb_to_postgresql import *
 import pipeline.prompts as prompts
 from llm import GPT4, DepictQA
 from executor import executor, Tool
+import socket
+
+
+# load config
+def load_model_configs(config_path="../../model_services.yaml"):
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    return config
+
+
+def is_port_in_use(port, host="127.0.0.1"):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.2)
+        result = s.connect_ex((host, port))
+        return result == 0
 
 
 def get_logger(logger_name: str,
@@ -275,13 +290,15 @@ def schedule_w_experience(state, gpt4, degradations, agenda, ps):
     
     with open(state["schedule_experience_path"], "r") as f:
         schedule_experience: str = json.load(f)["distilled"]
+    
+    schedule = 
 
-    schedule = gpt4(
-            prompt=prompts.schedule_w_retrieval_prompt.format(
-                degradations=degradations, agenda=agenda,
-                experience=schedule_experience
-            ) + ps,
-            format_check=check_order)
+    #schedule = gpt4(
+    #        prompt=prompts.schedule_w_retrieval_prompt.format(
+    #            degradations=degradations, agenda=agenda,
+    #            experience=schedule_experience
+    #        ) + ps,
+    #        format_check=check_order)
     schedule = eval(schedule)
     workflow_logger.info(f"Insights: {schedule['thought']}")
     return schedule["order"]
@@ -327,6 +344,9 @@ def compare_quality(depictqa, img_path1, img_path2):
 
 def search_best_by_comp(candidates, state):
     best_img = candidates[0]
+    
+    is_port_in_use(port, host="127.0.0.1")
+
     for i in range(1, len(candidates)):
         cur_img = candidates[i]
         choice = compare_quality(state["depictqa"], best_img, cur_img)

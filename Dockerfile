@@ -84,7 +84,7 @@ RUN pip install numpy==1.24.1 torch==2.1.0 opencv-python==4.8.0.76 \
   && source activate depictqa  \
   && pip install -r /${ROOT}/AgenticIR/DepictQA/requirements.txt  \
   && pip install flask huggingface-hub==0.23.0  \
-  && cd /${ROOT}/AgenticIR/DepictQA && sh launch_service.sh  \
+#  && cd /${ROOT}/AgenticIR/DepictQA && sh launch_service.sh  \
 \
   && conda create -y -n dehazeformer python=3.10  \
   && source activate dehazeformer  \

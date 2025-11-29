@@ -6,6 +6,7 @@ import shutil
 import logging
 from time import localtime, strftime
 from utils.util import *
+from utils.GPUServiceManager import *
 
 
 ROOT = "/home/jason/Auto-Image-Restoration"
@@ -79,6 +80,20 @@ def evaluate_by_retrieval(state: ImageState):
 
 # [('motion blur', 'very high'), ...]
 def first_evaluate_by_depictqa(state: ImageState):
+    
+    model_service_yaml = state["model_service_yaml"]
+
+    DIR = model_service_yaml["depictqa"]["dir"]
+    cmd = model_service_yaml["depictqa"]["app_eval"]["launch_cmd"]
+    port = model_service_yaml["depictqa"]["app_eval"]["port"]
+    host = model_service_yaml["depictqa"]["app_eval"]["host"]
+    
+    in_use = is_port_in_use(port, host)
+    launch_cmd = f"cd {os.path.join(ROOT, DIR)} && {launch_cmd}"
+
+    if not in_use:
+        state["gpu_service_manager"].start_service("depictqa_eval", launch_cmd)
+
     evaluation = eval(
         state["depictqa"](Path(state["input_img_path"]), task="eval_degradation"))
     
@@ -90,9 +105,24 @@ def first_evaluate_by_depictqa(state: ImageState):
 
 def evaluate_tool_result(state: ImageState):
     print("Evaluate img: ", state["cur_path"])
+
+    model_service_yaml = state["model_service_yaml"]
+
+    DIR = model_service_yaml["depictqa"]["dir"]
+    cmd = model_service_yaml["depictqa"]["app_eval"]["launch_cmd"]
+    port = model_service_yaml["depictqa"]["app_eval"]["port"]
+    host = model_service_yaml["depictqa"]["app_eval"]["host"]
+
+    in_use = is_port_in_use(port, host)
+    launch_cmd = f"cd {os.path.join(ROOT, DIR)} && {launch_cmd}"
+
+    if not in_use:
+        state["gpu_service_manager"].start_service("depictqa_eval", launch_cmd)
+
     level = eval(
         state["depictqa"](Path(state["cur_path"]), task="eval_degradation")
         )[0][1]
+
     return level
 
 
@@ -146,6 +176,8 @@ def execute_one_degradation(state:ImageState):
 
     subtask = remaining_plan.pop(0)
 
+    model_service_yaml = state["model_service_yaml"]
+
     if subtask != "brightening":
         toolbox = list(model_service_yaml[subtask].keys())
     else:
@@ -191,7 +223,7 @@ def execute_one_degradation(state:ImageState):
         
         # launch server
         if not in_use:
-            os.system(server_launch_cmd)
+            state["gpu_service_manager"].start_service(tool_name.lower(), server_launch_cmd)
 
         tool_output_dir = subtask_output_dir / tool_name
         os.makedirs(tool_output_dir, exist_ok=True)
@@ -222,6 +254,20 @@ def execute_one_degradation(state:ImageState):
 
     # no result with "very low" degradation level
     else:
+
+        model_service_yaml = state["model_service_yaml"]
+
+        DIR = model_service_yaml["depictqa"]["dir"]
+        cmd = model_service_yaml["depictqa"]["app_comp"]["launch_cmd"]
+        port = model_service_yaml["depictqa"]["app_comp"]["port"]
+        host = model_service_yaml["depictqa"]["app_comp"]["host"]
+
+        in_use = is_port_in_use(port, host)
+        launch_cmd = f"cd {os.path.join(ROOT, DIR)} && {launch_cmd}"
+
+        if not in_use:
+            state["gpu_service_manager"].start_service("depictqa_comp", launch_cmd)
+
         for res_level in state["levels"][1:]:
             if res_level in res_degra_level_dict:
                 candidates = res_degra_level_dict[res_level]
@@ -257,9 +303,6 @@ def execute_one_degradation(state:ImageState):
 def get_output(state:ImageState):
     shutil.copy(state["best_img_path"], "final_output")
     print("Finished image restoration, output to ./final_output")
-    return state
-
-
     return state
 
 
@@ -336,7 +379,7 @@ def run_agent():
 
     # set input_img_path
     invoke_dict["input_img_path"] = "./demo_input/input.png"
-    invoke_dict["model_service_yaml"] = "./model_service/model_services.yaml"
+    invoke_dict["model_service_yaml"] = load_model_configs("../AgentApp/model_service/model_services.yaml")
 
     invoke_dict["image"] = None
 
@@ -378,7 +421,8 @@ def run_agent():
     invoke_dict["task_id"] = ""
     invoke_dict["tool_execution_count"] = 0
     invoke_dict["executed_plans"] = []
-    
+    invoke_dict["gpu_service_manager"] = GPUServiceManager()
+
     os.makedirs(invoke_dict["tmp_input_dir"], exist_ok=True)
     os.makedirs(invoke_dict["tmp_output_dir"], exist_ok=True)
 
@@ -388,8 +432,12 @@ def run_agent():
     app = create_image_analysis_graph()
     result = app.invoke(invoke_dict)
 
+
 if __name__ == "__main__":
     run_agent()
+
+
+
 
 
 

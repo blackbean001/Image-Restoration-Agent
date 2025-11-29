@@ -8,6 +8,12 @@ from time import localtime, strftime
 from utils.util import *
 
 
+def load_model_configs(config_path="../../model_services.yaml"):
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    return config
+
+
 # define LangGraph state
 class ImageState(dict):
     input_img_path: Path
@@ -49,7 +55,7 @@ def load_image(state: ImageState):
         state["image"] = img
     state["cur_path"] = cpy(state["input_img_path"])
 
-    shutil.copy(state["input_img_path"], state["tmp_input_dir"] / "input.png")
+    0shutil.copy(state["input_img_path"], state["tmp_input_dir"] / "input.png")
     print(f"Finished loading image from {state['input_img_path']}, and copy to {state['tmp_input_dir']}")
     return state
 
@@ -138,6 +144,9 @@ def execute_one_degradation(state:ImageState):
     state["executed_plans"].append(cpy(remaining_plan))
     print(f"Remaining subtasks for execution: {remaining_plan}")
     print(f"Executed_plans: ", state['executed_plans'])
+    
+    model_service_yaml = state["model_service_yaml"]
+    cfg = load_model_configs(model_service_yaml)
 
     index = str(state["tool_execution_count"])
     
@@ -147,7 +156,7 @@ def execute_one_degradation(state:ImageState):
     toolbox = get_toolbox(state, subtask)
 
     o_name = "_".join(str(state['input_img_path']).split("/")[-1:])
-    
+
     processed_images = {item.split("-")[0]:None for item in os.listdir(state['tmp_output_dir'])}
     if o_name in processed_images and index == 0:
         print(f"Image {o_name} has already been processed. SKIP...")
@@ -212,7 +221,7 @@ def execute_one_degradation(state:ImageState):
     state["remaining_plan"] = remaining_plan
     state["subtask_success"][subtask + "-" + index] = success
     state["tool_execution_count"] += 1
-    
+
     # rollback if not success
     if not success and state["with_rollback"]:
         roll_back_plans = state["remaining_plan"] + [subtask]
