@@ -18,8 +18,10 @@
 
 **To-dos**:   
 1. Change model inference to service request. (&#10004)
-2. Provide option for Kubernetes deployment, and use polling, mps or time-slicing to improve GPUs utilization.
-3. Inference acceleration for each individual model.
+2. Use a service manager to kill least-used services when overloaded. (&#10004).
+3. Adaptively select GPU rank when launching new service for better GPU utilization.
+4. Provide option for Kubernetes deployment, and use polling, mps or time-slicing to improve GPU utilization.
+5. Inference acceleration for each individual model.
 
 
 ![image](https://github.com/blackbean001/Auto-Image-Restoration/blob/main/pngs/pipeline.png)
