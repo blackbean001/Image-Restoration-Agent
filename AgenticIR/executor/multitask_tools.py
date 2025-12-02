@@ -6,6 +6,7 @@ import shutil
 from .tool import Tool
 
 
+
 class BasicSRModel(Tool):
     """Model based on [BasicSR template](https://github.com/XPixelGroup/BasicSR). Note that a file `{work_dir}/{tool_name}/inference.py` modified from `{work_dir}/{tool_name}/test.py` is added to allow customizing output directory during inference."""
 
@@ -244,7 +245,7 @@ class MAXIM(Tool):
         """Requires parameter `input_dir: Path`, `output_dir: Path`, `opt_task: str`, and `opt_ckpt_name: str`."""
         return [
             "--task", self.opt_task,
-            "--ckpt_path", f"maxim/maxim/checkpoints/{self.opt_ckpt_name}",
+            "--ckpt_path", Path().resolve() / f"./weights/dehazing/maxim/{self.opt_ckpt_name}",
             "--input_dir", self.input_dir,
             "--output_dir", self.output_dir,
             "--has_target=False"
