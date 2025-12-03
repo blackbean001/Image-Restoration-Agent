@@ -1,6 +1,3 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-
 from langgraph.graph import StateGraph, END
 from copy import deepcopy as cpy
 from PIL import Image, ImageOps
@@ -9,6 +6,12 @@ import shutil
 import logging
 from time import localtime, strftime
 from utils.util import *
+
+
+def load_model_configs(config_path="../../model_services.yaml"):
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    return config
 
 
 # define LangGraph state
@@ -47,14 +50,12 @@ class ImageState(dict):
 
 def load_image(state: ImageState):
     assert state["input_img_path"] != "", "Please input image_path or image"
-    print("input_img_path: ", state["input_img_path"])
-
     if state["image"] == None:
         img = Image.open(state["input_img_path"])
         state["image"] = img
     state["cur_path"] = cpy(state["input_img_path"])
 
-    shutil.copy(state["input_img_path"], state["tmp_input_dir"] / "input.png")
+    0shutil.copy(state["input_img_path"], state["tmp_input_dir"] / "input.png")
     print(f"Finished loading image from {state['input_img_path']}, and copy to {state['tmp_input_dir']}")
     return state
 
@@ -86,6 +87,7 @@ def first_evaluate_by_depictqa(state: ImageState):
     
     state["res_seq_depictqa"] = evaluation
     print(f'Finished evaluate by DepictQA, result: {state["res_seq_depictqa"]}')
+
     return state
 
 
@@ -143,6 +145,9 @@ def execute_one_degradation(state:ImageState):
     print(f"Remaining subtasks for execution: {remaining_plan}")
     print(f"Executed_plans: ", state['executed_plans'])
     
+    model_service_yaml = state["model_service_yaml"]
+    cfg = load_model_configs(model_service_yaml)
+
     index = str(state["tool_execution_count"])
     
     subtask = remaining_plan.pop(0)

@@ -58,8 +58,7 @@ async def root():
 
 @app.post("/restoration", response_model=ImageRestorationResponse)
 async def image_restoration_endpoint(
-#    file: UploadFile = File(...),
-    file: str = "input.png",
+    file: UploadFile = File(...),
     output_format: str = Form("PNG")
     ):
     """
@@ -77,9 +76,8 @@ async def image_restoration_endpoint(
 
     try:
         # read image and transfer
-        # image_bytes = await file.read()
-        #input_image = Image.open(io.BytesIO(image_bytes))
-        input_image = Image.open(file)
+        image_bytes = await file.read()
+        input_image = Image.open(io.BytesIO(image_bytes))
 
         # input args
         invoke_dict = {}
@@ -88,8 +86,7 @@ async def image_restoration_endpoint(
         CLIP4CIR_model_dir = Path("../AgenticIR/retrival_database/CLIP4CIR/models")
 
         # set input_img_path
-        #invoke_dict["input_img_path"] = "./demo_input/001.png"
-        invoke_dict["input_img_path"] = file
+        invoke_dict["input_img_path"] = "./demo_input/001.png"
         invoke_dict["image"] = input_image
         invoke_dict["depictqa"] = get_depictqa()
         invoke_dict["gpt4"] = get_GPT4(AgenticIR_dir / "config.yml")
@@ -129,18 +126,18 @@ async def image_restoration_endpoint(
         invoke_dict["task_id"] = ""
         invoke_dict["tool_execution_count"] = 0
         invoke_dict["executed_plans"] = []
-        
+  
         final_state = image_graph.invoke(invoke_dict)
         
         # get output image
         output_image = Image.open(final_state.get("best_img_path"))
-        
+
         if output_image is None:
             raise HTTPException(status_code=500, detail="Image restoration failed")
-        
+
         # transform back to bytes and return
         output_bytes = pil_to_bytes(output_image, format=output_format)
-        
+
         return Response(
             content=output_bytes,
             media_type=f"image/{output_format.lower()}",
@@ -156,6 +153,15 @@ async def image_restoration_endpoint(
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=1146, log_level="info")
+
+
+
+
+
+
+
+
+
 
 
 
