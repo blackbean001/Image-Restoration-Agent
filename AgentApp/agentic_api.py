@@ -43,6 +43,12 @@ async def startup_event():
     global image_graph
 
     image_graph = create_image_analysis_graph()
+    
+    # make sure tmp dir exist
+    Path("tmp_img_input").mkdir(parents=True, exist_ok=True)
+    Path("tmp_img_output").mkdir(parents=True, exist_ok=True)
+    Path("final_output").mkdir(parents=True, exist_ok=True)
+
     print("LangGraph workflow has been initialized...")
 
 
@@ -78,6 +84,15 @@ async def image_restoration_endpoint(
         # read image and transfer
         image_bytes = await file.read()
         input_image = Image.open(io.BytesIO(image_bytes))
+        
+        # generate uid and tmp dir
+        task_id = str(uuid.uuid4())
+        tmp_input_dir = Path("tmp_img_input")
+        tmp_input_path = tmp_input_dir / f"{task_id}_input.png"
+        
+        # save image to tmp dir
+        input_image.save(tmp_input_path)
+        print(f"Input image saved to: {tmp_input_path}")
 
         # input args
         invoke_dict = {}
@@ -86,7 +101,7 @@ async def image_restoration_endpoint(
         CLIP4CIR_model_dir = Path("../AgenticIR/retrival_database/CLIP4CIR/models")
 
         # set input_img_path
-        invoke_dict["input_img_path"] = "./demo_input/001.png"
+        invoke_dict["input_img_path"] = str(tmp_input_path)
         invoke_dict["image"] = input_image
         invoke_dict["depictqa"] = get_depictqa()
         invoke_dict["gpt4"] = get_GPT4(AgenticIR_dir / "config.yml")
