@@ -291,14 +291,13 @@ def schedule_w_experience(state, gpt4, degradations, agenda, ps):
     with open(state["schedule_experience_path"], "r") as f:
         schedule_experience: str = json.load(f)["distilled"]
     
-    schedule = 
-
-    #schedule = gpt4(
-    #        prompt=prompts.schedule_w_retrieval_prompt.format(
-    #            degradations=degradations, agenda=agenda,
-    #            experience=schedule_experience
-    #        ) + ps,
-    #        format_check=check_order)
+    schedule = gpt4(
+            prompt=prompts.schedule_w_retrieval_prompt.format(
+                degradations=degradations, agenda=agenda,
+                experience=schedule_experience
+            ) + ps,
+            format_check=check_order)
+    
     schedule = eval(schedule)
     workflow_logger.info(f"Insights: {schedule['thought']}")
     return schedule["order"]
