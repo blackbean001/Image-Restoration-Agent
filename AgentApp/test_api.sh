@@ -1,4 +1,2 @@
-curl -X POST "http://0.0.0.0:1146/restoration"  \
-	-F "file=@./demo_input/001.png"  \
-	-F "output_format=PNG"  \
-	--output restored.png
+curl -X POST http://localhost:1146/process \
+     -F "image_path=demo_input/input.png"

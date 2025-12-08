@@ -37,7 +37,7 @@ network_g:
 
 # path
 path:
-  pretrain_network_g: X-Restormer/experiments/pretrained/denoise_300k.pth
+  pretrain_network_g: /home/jason/Auto-Image-Restoration/AgentApp/executor/dehazing/tools/X-Restormer/experiments/pretrained/denoise_300k.pth
   strict_load_g: true
   resume_state: ~
   results: ~
