@@ -9,6 +9,7 @@ from time import localtime, strftime
 import cv2
 import json
 import random
+import yaml
 from typing import Optional
 
 import psycopg2
@@ -344,7 +345,7 @@ def compare_quality(depictqa, img_path1, img_path2):
 def search_best_by_comp(candidates, state):
     best_img = candidates[0]
     
-    is_port_in_use(port, host="127.0.0.1")
+    #is_port_in_use(port, host="127.0.0.1")
 
     for i in range(1, len(candidates)):
         cur_img = candidates[i]

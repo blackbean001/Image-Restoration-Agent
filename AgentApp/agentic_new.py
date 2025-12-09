@@ -1,3 +1,6 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+
 from langgraph.graph import StateGraph, END
 from copy import deepcopy as cpy
 from PIL import Image, ImageOps
@@ -44,7 +47,8 @@ class ImageState(dict):
     with_rollback: bool
     tool_execution_count: int
     executed_plans: list
-
+    model_service_yaml: dict
+    gpu_service_manager: GPUServiceManager
 
 def load_image(state: ImageState):
     assert state["input_img_path"] != "", "Please input image_path or image"
@@ -80,7 +84,6 @@ def evaluate_by_retrieval(state: ImageState):
 
 # [('motion blur', 'very high'), ...]
 def first_evaluate_by_depictqa(state: ImageState):
-    
     model_service_yaml = state["model_service_yaml"]
 
     DIR = model_service_yaml["depictqa"]["dir"]
@@ -89,7 +92,7 @@ def first_evaluate_by_depictqa(state: ImageState):
     host = model_service_yaml["depictqa"]["app_eval"]["host"]
     
     in_use = is_port_in_use(port, host)
-    launch_cmd = f"cd {os.path.join(ROOT, DIR)} && {launch_cmd}"
+    launch_cmd = f"cd {os.path.join(ROOT, DIR)} && {cmd}"
 
     if not in_use:
         state["gpu_service_manager"].start_service("depictqa_eval", launch_cmd)
@@ -114,7 +117,7 @@ def evaluate_tool_result(state: ImageState):
     host = model_service_yaml["depictqa"]["app_eval"]["host"]
 
     in_use = is_port_in_use(port, host)
-    launch_cmd = f"cd {os.path.join(ROOT, DIR)} && {launch_cmd}"
+    launch_cmd = f"cd {os.path.join(ROOT, DIR)} && {cmd}"
 
     if not in_use:
         state["gpu_service_manager"].start_service("depictqa_eval", launch_cmd)
@@ -217,7 +220,7 @@ def execute_one_degradation(state:ImageState):
         host = tool_yml["host"]
         port = tool_yml["port"]
         request_cmd = tool_yml["curl_cmd"]
-        server_launch_cmd = f"nohup conda run {tool_name.lower()} python {os.path.join(ROOT, DIR, 'model_serving.py)'} >> logs/logs_{tool_name}.log"
+        server_launch_cmd = f"nohup conda run {tool_name.lower()} python {os.path.join(ROOT, DIR, 'model_serving.py')} >> logs/logs_{tool_name}.log"
 
         in_use = is_port_in_use(port, host)
         
@@ -230,7 +233,7 @@ def execute_one_degradation(state:ImageState):
 
         # request
         if subtask != "brightening":
-            request_cmd.replace("input_path", state["input_img_path"]).replace("output_path", tool_output_dir / "output.png")
+            request_cmd.replace("input_path", state["input_img_path"]).replace("output_path", str(tool_output_dir / "output.png"))
         else:
             request_cmd.replace("brightening_method", "constant_shift")
 
@@ -423,8 +426,14 @@ def run_agent():
     invoke_dict["executed_plans"] = []
     invoke_dict["gpu_service_manager"] = GPUServiceManager()
 
+    try:
+        shutil.rmtree(invoke_dict["tmp_input_dir"])
+        shutil.rmtree(invoke_dict["tmp_output_dir"])
+    except:
+        1
     os.makedirs(invoke_dict["tmp_input_dir"], exist_ok=True)
     os.makedirs(invoke_dict["tmp_output_dir"], exist_ok=True)
+    os.makedirs(invoke_dict["final_output"], exist_ok=True)
 
     shutil.copy(invoke_dict["input_img_path"], invoke_dict["tmp_input_dir"])
 
@@ -435,10 +444,5 @@ def run_agent():
 
 if __name__ == "__main__":
     run_agent()
-
-
-
-
-
 
 

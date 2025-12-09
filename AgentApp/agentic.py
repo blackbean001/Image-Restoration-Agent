@@ -1,3 +1,6 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+
 from langgraph.graph import StateGraph, END
 from copy import deepcopy as cpy
 from PIL import Image, ImageOps
@@ -6,12 +9,6 @@ import shutil
 import logging
 from time import localtime, strftime
 from utils.util import *
-
-
-def load_model_configs(config_path="../../model_services.yaml"):
-    with open(config_path, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
-    return config
 
 
 # define LangGraph state
@@ -143,12 +140,13 @@ def execute_one_degradation(state:ImageState):
     remaining_plan = state["remaining_plan"]
     state["executed_plans"].append(cpy(remaining_plan))
     print(f"Remaining subtasks for execution: {remaining_plan}")
+        print(5)
     print(f"Executed_plans: ", state['executed_plans'])
     
     index = str(state["tool_execution_count"])
     
     subtask = remaining_plan.pop(0)
-    
+
     # only one tool when using retrieval
     toolbox = get_toolbox(state, subtask)
 
@@ -168,7 +166,7 @@ def execute_one_degradation(state:ImageState):
         os.makedirs(task_output_dir, exist_ok=True)
     else:
         task_output_dir = os.path.join(os.path.abspath('.'), state['tmp_output_dir'], state["task_id"])
-
+    
     subtask_output_dir = Path(task_output_dir) / (subtask + "-" + index)
     os.makedirs(subtask_output_dir, exist_ok=True)
     print(f"Generate output to {subtask_output_dir}")
@@ -180,11 +178,15 @@ def execute_one_degradation(state:ImageState):
     for tool in toolbox:
         tool_output_dir = subtask_output_dir / tool.tool_name
         os.makedirs(tool_output_dir, exist_ok=True)
-        tool(
-            input_dir=os.path.abspath('.') / state['tmp_input_dir'],
-            output_dir=tool_output_dir,
-            silent=True,
-        )
+        try:
+            tool(
+                input_dir=os.path.abspath('.') / state['tmp_input_dir'],
+                output_dir=tool_output_dir,
+                silent=True,
+            )
+        except Exception as e:
+            print(f"Error: {e}")
+
         state["cur_path"] = tool_output_dir / "output.png"
         degra_level = evaluate_tool_result(state)
         print(f"Using tool {tool.tool_name}, output to {tool_output_dir}, degra_level {degra_level}")
@@ -214,11 +216,12 @@ def execute_one_degradation(state:ImageState):
                 shutil.copy(best_img_path, state['tmp_input_dir'] / "input.png")
                 state["best_img_path"] = best_img_path
                 break
-
+    
     state["remaining_plan"] = remaining_plan
     state["subtask_success"][subtask + "-" + index] = success
     state["tool_execution_count"] += 1
-
+    
+    print(355)
     # rollback if not success
     if not success and state["with_rollback"]:
         roll_back_plans = state["remaining_plan"] + [subtask]
@@ -228,12 +231,13 @@ def execute_one_degradation(state:ImageState):
             print(f"Subtask ({subtask}) restoration not success, insert baack to the plans, current remaining plans: {remaining_plan}")
     else:
         print(f"Plan {subtask} execute successfully.")
+    print(356)
     return state
 
 
 def get_output(state:ImageState):
-    shutil.copy(state["best_img_path"], "final_output")    
-    print("Finished image restoration, output to ./final_output")
+    shutil.copy(state["best_img_path"], "final_output.png")    
+    print("Finished image restoration, output to ./final_output.png")
     return state
 
 
@@ -345,9 +349,15 @@ def run_agent():
     invoke_dict["task_id"] = ""
     invoke_dict["tool_execution_count"] = 0
     invoke_dict["executed_plans"] = []
-    
+
+    try:
+        shutil.rmtree(invoke_dict["tmp_input_dir"])
+        shutil.rmtree(invoke_dict["tmp_output_dir"])
+    except:
+        1
     os.makedirs(invoke_dict["tmp_input_dir"], exist_ok=True)
     os.makedirs(invoke_dict["tmp_output_dir"], exist_ok=True)
+    os.makedirs(invoke_dict["final_output"], exist_ok=True)
 
     shutil.copy(invoke_dict["input_img_path"], invoke_dict["tmp_input_dir"])
 
